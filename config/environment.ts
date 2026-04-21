@@ -1,0 +1,6 @@
+export const environment = {
+  SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  SUPABASE_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
+  SUPABASE_SERVISE_ROLE_KEY: process.env.SUPABASE_SERVISE_ROLE_KEY || "",
+};
