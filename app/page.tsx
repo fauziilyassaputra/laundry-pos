@@ -7,6 +7,7 @@ export default function Home() {
     <div className="">
       <Button className="bg-amber-800 dark:bg-yellow-500">welcome</Button>
       <DarkModeToggle />
+      <p className="font-sans">lorem ipsum damet</p>
     </div>
   );
 }
