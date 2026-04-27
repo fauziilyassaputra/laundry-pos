@@ -9,3 +9,11 @@ export type authFormState = {
     _form?: string[];
   };
 };
+
+export type Profile = {
+  id?: string;
+  nama?: string;
+  nomor_telepon?: string;
+  jabatan?: string;
+  avatar_url?: string;
+};

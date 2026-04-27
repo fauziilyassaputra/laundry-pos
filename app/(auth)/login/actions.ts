@@ -44,7 +44,7 @@ export async function login(
   }
 
   const { data: user_profile } = await supabase
-    .from("users")
+    .from("profiles")
     .select("*")
     .eq("id", user?.id)
     .single();

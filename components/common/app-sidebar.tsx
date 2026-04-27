@@ -29,15 +29,12 @@ import {
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/actions/auth-action";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function AppSidebar() {
   const { isMobile } = useSidebar();
   const pathname = usePathname();
-  const users = {
-    name: "Wise",
-    role: "manager",
-    avatar_url: "",
-  };
+  const profile = useAuthStore((state) => state.profile);
   return (
     <Sidebar>
       {/*  */}
@@ -59,22 +56,24 @@ export default function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {SIDEBAR_MENU_LIST[users.role as SidebarMenuKey]?.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
-                      className={cn("px-4 py-3 h-auto", {
-                        "bg-teal-500 text-white hover:bg-teal-500 hover:text-white":
-                          pathname === item.url,
-                      })}
-                    >
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {SIDEBAR_MENU_LIST[profile.jabatan as SidebarMenuKey]?.map(
+                (item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href={item.url}
+                        className={cn("px-4 py-3 h-auto", {
+                          "bg-teal-500 text-white hover:bg-teal-500 hover:text-white":
+                            pathname === item.url,
+                        })}
+                      >
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ),
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -90,9 +89,9 @@ export default function AppSidebar() {
                     <AvatarFallback className="rounded-lg">A</AvatarFallback>
                   </Avatar>
                   <div className="leading-tight">
-                    <h4 className="truncate font-medium">Wise</h4>
+                    <h4 className="truncate font-medium"> {profile.nama} </h4>
                     <p className="text-muted-foreground truncate text-xs">
-                      Manager
+                      {profile.jabatan}
                     </p>
                   </div>
                   <EllipsisVertical className="ml-auto size-4" />
@@ -108,12 +107,14 @@ export default function AppSidebar() {
                   <div className="flex items-center gap-2 px-1 py-1.5">
                     <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage src="" />
-                      <AvatarFallback className="rounded-lg">A</AvatarFallback>
+                      <AvatarFallback className="rounded-lg">
+                        {profile.nama?.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="leading-tight">
-                      <h4 className="truncate font-medium">Wise</h4>
+                      <h4 className="truncate font-medium"> {profile.nama} </h4>
                       <p className="text-muted-foreground truncate text-xs">
-                        Manager
+                        {profile.jabatan}
                       </p>
                     </div>
                   </div>

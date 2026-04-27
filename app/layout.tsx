@@ -4,6 +4,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/common/theme-provider";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
+import AuthStoreProviders from "@/providers/auth-store-provider";
+import { cookies } from "next/headers";
+import ReactQueryProvider from "@/providers/react-query-provider";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -25,11 +28,13 @@ export const metadata: Metadata = {
   description: "point of sales laundry system",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const profile = JSON.parse(cookieStore.get("user_profile")?.value ?? "{}");
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -42,15 +47,19 @@ export default function RootLayout({
         // className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         // className="font-sans"
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <ReactQueryProvider>
+          <AuthStoreProviders profile={profile}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </AuthStoreProviders>
+        </ReactQueryProvider>
       </body>
     </html>
   );
