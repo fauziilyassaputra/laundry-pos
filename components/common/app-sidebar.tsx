@@ -15,15 +15,29 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "../ui/sidebar";
+import {
+  SIDEBAR_MENU_LIST,
+  SidebarMenuKey,
+} from "@/constants/sidebar-constant";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { signOut } from "@/actions/auth-action";
 
 export default function AppSidebar() {
   const { isMobile } = useSidebar();
+  const pathname = usePathname();
+  const users = {
+    name: "Wise",
+    role: "manager",
+    avatar_url: "",
+  };
   return (
     <Sidebar>
       {/*  */}
@@ -41,6 +55,30 @@ export default function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {SIDEBAR_MENU_LIST[users.role as SidebarMenuKey]?.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a
+                      href={item.url}
+                      className={cn("px-4 py-3 h-auto", {
+                        "bg-teal-500 text-white hover:bg-teal-500 hover:text-white":
+                          pathname === item.url,
+                      })}
+                    >
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -82,7 +120,7 @@ export default function AppSidebar() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signOut()}>
                     <LogOut />
                     Logout
                   </DropdownMenuItem>
