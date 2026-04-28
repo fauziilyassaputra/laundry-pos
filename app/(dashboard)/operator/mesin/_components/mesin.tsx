@@ -13,7 +13,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
-export default function UserManagement() {
+export default function MesinManagement() {
   const supabase = createClient();
   const {
     currentPage,
@@ -27,11 +27,11 @@ export default function UserManagement() {
     queryKey: ["users", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const result = await supabase
-        .from("profiles")
+        .from("mesin")
         .select("*", { count: "exact" })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
         .order("created_at")
-        .ilike("nama", `%${currentSearch}%`);
+        .ilike("nama_mesin", `%${currentSearch}%`);
 
       if (result.error)
         toast.error("get user data failed: ", {
