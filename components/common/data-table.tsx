@@ -8,18 +8,40 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import PaginationDataTable from "./pagination-data-table";
+import { Label } from "../ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { LIMIT_LIST } from "@/constants/data-table-constant";
 
 export default function DataTable({
   header,
   data,
   isLoading,
+  totalPage,
+  currentPage,
+  currentLimit,
+  onChangePage,
+  onChangeLimit,
 }: {
   header: string[];
   data: (string | ReactNode)[][];
   isLoading?: boolean;
+  totalPage: number;
+  currentPage: number;
+  currentLimit: number;
+  onChangePage: (page: number) => void;
+  onChangeLimit: (page: number) => void;
 }) {
   return (
-    <div className="w-full flex-col gap-4">
+    <div className="w-full flex flex-col gap-4">
       <Card className="p-0">
         <Table className="w-full rounded-lg overflow-hidden">
           <TableHeader className="bg-muted sticky top-0 z-10">
@@ -37,7 +59,7 @@ export default function DataTable({
                 {row.map((column, columnIndex) => (
                   <TableCell
                     key={`{tr-${rowIndex} ${columnIndex}`}
-                    className="px-6 py-4"
+                    className="px-6 py-3"
                   >
                     {column}
                   </TableCell>
@@ -61,6 +83,38 @@ export default function DataTable({
           </TableBody>
         </Table>
       </Card>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Label>Limit</Label>
+          <Select
+            value={currentLimit.toString()}
+            onValueChange={(value) => onChangeLimit(Number(value))}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Limit</SelectLabel>
+                {LIMIT_LIST.map((limit) => (
+                  <SelectItem key={limit} value={limit.toString()}>
+                    {limit}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        {totalPage > 1 && (
+          <div className="flex justify-end">
+            <PaginationDataTable
+              currentPage={currentPage}
+              totalPage={totalPage}
+              onChangePage={onChangePage}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
