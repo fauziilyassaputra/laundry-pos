@@ -6,6 +6,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_MESIN } from "@/constants/mesin-constant";
 import { HEADER_TABLE_OPERASI } from "@/constants/operasi-mesin-constant";
+import { HEADER_TABLE_PELANGGAN } from "@/constants/pelanggan-constant";
 import { HEADER_TABLE_USER } from "@/constants/user-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
@@ -30,15 +31,13 @@ export default function PelangganManagement() {
     queryKey: ["pelanggan_pelanggan", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
-        .from("penggunaan_mesin")
+        .from("pelanggan")
         .select("*", { count: "exact" })
-        .range(
-          (currentPage - 1) * currentLimit,
-          currentPage * currentLimit - 1,
-        );
+        .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
+        .order("created_at");
       if (currentSearch) {
         query.or(
-          `nama_pelanggan.ilike.%${currentSearch}%,nomor_telepon.ilike.%${currentSearch}%,alamt_rumah.ilike.%${currentSearch}%`,
+          `nama_pelanggan.ilike.%${currentSearch}%,nomor_telepon.ilike.%${currentSearch}%,alamat_rumah.ilike.%${currentSearch}%`,
         );
       }
       const result = await query;
@@ -53,12 +52,22 @@ export default function PelangganManagement() {
   });
   const filteredData = useMemo(() => {
     return (pelanggan_pelanggan?.data || []).map((pelanggan, index) => {
+      if (pelanggan.alamat_rumah === null) {
+        pelanggan.alamat_rumah = "Tidak Dicantumkan";
+      }
       return [
         currentLimit * (currentPage - 1) + index + 1,
         pelanggan.id_pelanggan,
         pelanggan.nama_pelanggan,
         pelanggan.nomor_telepon,
-        pelanggan.alamat_rumah,
+        <p
+          className={cn("tx-sm", {
+            "text-muted-foreground":
+              pelanggan.alamat_rumah === "Tidak Dicantumkan",
+          })}
+        >
+          {pelanggan.alamat_rumah}
+        </p>,
         <DropdownAction
           menu={[
             {
@@ -95,7 +104,7 @@ export default function PelangganManagement() {
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
-        <h1 className="text-2xl font-bold">User Management</h1>
+        <h1 className="text-2xl font-bold">Pelanggan Management</h1>
         <div className="flex gap-2">
           <Input
             placeholder="Search by name"
@@ -109,7 +118,7 @@ export default function PelangganManagement() {
         </div>
       </div>
       <DataTable
-        header={HEADER_TABLE_OPERASI}
+        header={HEADER_TABLE_PELANGGAN}
         data={filteredData}
         isLoading={isLoading}
         currentPage={currentPage}
