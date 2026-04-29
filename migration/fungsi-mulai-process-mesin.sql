@@ -1,14 +1,18 @@
+
+DROP TRIGGER IF EXISTS trg_mulai_proses_mesin ON penggunaan_mesin;
+
 CREATE OR REPLACE FUNCTION mulai_proses_mesin()
 RETURNS TRIGGER AS $$
 DECLARE
-    v_tipe_mesin VARCHAR;
+   
+    v_tipe_mesin TEXT; 
 BEGIN
-    
     SELECT tipe_mesin INTO v_tipe_mesin 
     FROM mesin 
     WHERE id_mesin = NEW.id_mesin;
 
-    UPDATE mesin SET status = 'in use' WHERE id_mesin = NEW.id_mesin;
+   
+    UPDATE mesin SET status_mesin = 'in use' WHERE id_mesin = NEW.id_mesin;
    
     IF v_tipe_mesin = 'washer' THEN
         UPDATE pesanan SET status_pesanan = 'dicuci' WHERE id_pesanan = NEW.id_pesanan;

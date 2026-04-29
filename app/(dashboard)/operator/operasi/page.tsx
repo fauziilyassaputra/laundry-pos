@@ -1,9 +1,9 @@
-// import UserManagement from "./_components/user";
+import OperasiMesinManagement from "./_components/operasi-mesin";
 
 export const metadata = {
   title: "POS Laundry | Operasi Mesin",
 };
 
 export default function UserManagementPage() {
-  return <h1>Halaman operasi</h1>;
+  return <OperasiMesinManagement />;
 }
