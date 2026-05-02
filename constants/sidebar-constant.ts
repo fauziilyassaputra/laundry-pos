@@ -1,6 +1,7 @@
 import {
   Album,
   CircleDollarSign,
+  HandHeart,
   LayoutDashboard,
   Radius,
   Tags,
@@ -13,8 +14,9 @@ export const SIDEBAR_MENU_LIST = {
     { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
     { title: "Pesanan", url: "/pesanan", icon: Album },
     { title: "Pembayaran", url: "/cashier/pembayaran", icon: CircleDollarSign },
-    { title: "Mesin", url: "/operator/mesin", icon: WashingMachine },
     { title: "Operasi Mesin", url: "/operator/operasi", icon: Radius },
+    { title: "Mesin", url: "/operator/mesin", icon: WashingMachine },
+    { title: "Layanan", url: "/layanan", icon: HandHeart },
     { title: "Pelanggan", url: "/pelanggan", icon: Tags },
     { title: "User", url: "/admin/user", icon: User },
   ],

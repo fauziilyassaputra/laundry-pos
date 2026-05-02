@@ -1,0 +1,15 @@
+export const HEADER_TABLE_PESANAN = [
+  "No",
+  "ID Pesanan",
+  "ID Pelanggan",
+  "ID User",
+  "ID Layanan",
+  "Status Pesanan",
+  "Total Harga",
+  "catatan",
+  "Tanggal Masuk",
+  "Tanggal Estimasi Selesai",
+  "Tanggal Selesai",
+  "Tipe Pesanan",
+  "Action",
+];

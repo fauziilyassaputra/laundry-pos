@@ -42,11 +42,11 @@ export default function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <div className="flex items-center gap-2 self-center font-medium">
+              <div className="flex items-center gap-2 self-center ">
                 <div className="bg-teal-500 flex p-2 items-center justify-center rounded-md">
                   <WashingMachine className="size-4" />
                 </div>
-                POS Laundry
+                <h1 className="text-xl font-semibold">POS Laundry</h1>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -85,7 +85,7 @@ export default function AppSidebar() {
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src="" />
+                    <AvatarImage src={profile.avatar_url} alt={profile.nama} />
                     <AvatarFallback className="rounded-lg">A</AvatarFallback>
                   </Avatar>
                   <div className="leading-tight">
@@ -106,7 +106,10 @@ export default function AppSidebar() {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src="" />
+                      <AvatarImage
+                        src={profile.avatar_url}
+                        alt={profile.nama}
+                      />
                       <AvatarFallback className="rounded-lg">
                         {profile.nama?.charAt(0)}
                       </AvatarFallback>

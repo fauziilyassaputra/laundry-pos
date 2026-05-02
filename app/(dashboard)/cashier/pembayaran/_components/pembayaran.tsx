@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_MESIN } from "@/constants/mesin-constant";
-import { HEADER_TABLE_PEMBAYARAN } from "@/constants/pembayaran-constan";
+import { HEADER_TABLE_PEMBAYARAN } from "@/constants/pembayaran-constant";
 import { HEADER_TABLE_USER } from "@/constants/user-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";

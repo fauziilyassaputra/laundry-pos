@@ -4,14 +4,10 @@ import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { HEADER_TABLE_MESIN } from "@/constants/mesin-constant";
-import { HEADER_TABLE_OPERASI } from "@/constants/operasi-mesin-constant";
 import { HEADER_TABLE_PELANGGAN } from "@/constants/pelanggan-constant";
-import { HEADER_TABLE_USER } from "@/constants/user-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-import { Profile } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
@@ -37,13 +33,13 @@ export default function PelangganManagement() {
         .order("created_at");
       if (currentSearch) {
         query.or(
-          `nama_pelanggan.ilike.%${currentSearch}%,nomor_telepon.ilike.%${currentSearch}%,alamat_rumah.ilike.%${currentSearch}%`,
+          `status_pesanan.ilike.%${currentSearch}%,nomor_telepon.ilike.%${currentSearch}%,alamat_rumah.ilike.%${currentSearch}%`,
         );
       }
       const result = await query;
 
       if (result.error)
-        toast.error("get mesin data failed: ", {
+        toast.error("get pelanggan data failed: ", {
           description: result.error.message,
         });
 

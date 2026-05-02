@@ -4,6 +4,7 @@ import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { HEADER_TABLE_LAYANAN } from "@/constants/layanan-constant";
 import { HEADER_TABLE_MESIN } from "@/constants/mesin-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
@@ -23,11 +24,11 @@ export default function MesinManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: mesin_mesin, isLoading } = useQuery({
-    queryKey: ["mesin_mesin", currentPage, currentLimit, currentSearch],
+  const { data: layanan_layanan, isLoading } = useQuery({
+    queryKey: ["layanan_layanan", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
-        .from("mesin")
+        .from("layanan")
         .select("*", { count: "exact" })
         .range(
           (currentPage - 1) * currentLimit,
@@ -35,7 +36,7 @@ export default function MesinManagement() {
         );
       if (currentSearch) {
         query.or(
-          `nama_mesin.ilike.%${currentSearch}%,tipe_mesin.ilike.%${currentSearch}%,status_mesin.ilike.%${currentSearch}%`,
+          `nama_layanan.ilike.%${currentSearch}%,harga_perkilo.ilike.%${currentSearch}%`,
         );
       }
       const result = await query;
@@ -49,25 +50,13 @@ export default function MesinManagement() {
     },
   });
   const filteredData = useMemo(() => {
-    return (mesin_mesin?.data || []).map((mesin, index) => {
-      if (mesin.tanggal_service_terakhir === null) {
-        mesin.tanggal_service_terakhir = "tidak ada perbaikan sama sekali";
-      }
+    return (layanan_layanan?.data || []).map((layanan, index) => {
       return [
         currentLimit * (currentPage - 1) + index + 1,
-        mesin.id_mesin,
-        mesin.nama_mesin,
-        <h4 className="font-bold">{mesin.tipe_mesin}</h4>,
-        <div
-          className={cn("px-2 py-1 rounded-full text-white w-fit capitalize", {
-            "bg-green-600": mesin.status_mesin === "ready",
-            "bg-red-600": mesin.status_mesin === "in use",
-            "bg-gray-500": mesin.status_mesin === "broken",
-          })}
-        >
-          {mesin.status_mesin}
-        </div>,
-        mesin.tanggal_service_terakhir,
+        layanan.id_layanan,
+        layanan.nama_layanan,
+        layanan.harga_perkilo,
+        layanan.estimasi_hari,
         <DropdownAction
           menu={[
             {
@@ -93,18 +82,18 @@ export default function MesinManagement() {
         />,
       ];
     });
-  }, [mesin_mesin]);
+  }, [layanan_layanan]);
 
   const totalPages = useMemo(() => {
-    return mesin_mesin && mesin_mesin.count !== null
-      ? Math.ceil(mesin_mesin.count / currentLimit)
+    return layanan_layanan && layanan_layanan.count !== null
+      ? Math.ceil(layanan_layanan.count / currentLimit)
       : 0;
-  }, [mesin_mesin]);
+  }, [layanan_layanan]);
 
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
-        <h1 className="text-2xl font-bold">Mesin Management</h1>
+        <h1 className="text-2xl font-bold">Layanan Management</h1>
         <div className="flex gap-2">
           <Input
             placeholder="Search by name"
@@ -118,7 +107,7 @@ export default function MesinManagement() {
         </div>
       </div>
       <DataTable
-        header={HEADER_TABLE_MESIN}
+        header={HEADER_TABLE_LAYANAN}
         data={filteredData}
         isLoading={isLoading}
         currentPage={currentPage}

@@ -4,6 +4,6 @@ export const metadata = {
   title: "POS Laundry | Mesin Laundry",
 };
 
-export default function UserManagementPage() {
+export default function PembayaranManagementPage() {
   return <PembayaranManagement />;
 }
