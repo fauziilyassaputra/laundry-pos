@@ -9,7 +9,8 @@ import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, ScrollText, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
@@ -100,22 +101,15 @@ export default function PesananManagement() {
           menu={[
             {
               label: (
-                <span className="flex item-center gap-2">
-                  <Pencil />
-                  Edit
-                </span>
+                <Link
+                  href={`/pesanan/${pesanan.id_pesanan}`}
+                  className="flex item-center gap-2"
+                >
+                  <ScrollText />
+                  Detail
+                </Link>
               ),
-              action: () => {},
-            },
-            {
-              label: (
-                <span className="flex item-center gap-2">
-                  <Trash2 className="text-red-400" />
-                  Delete
-                </span>
-              ),
-              variant: "destructive",
-              action: () => {},
+              type: "link",
             },
           ]}
         />,
