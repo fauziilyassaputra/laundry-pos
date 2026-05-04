@@ -11,13 +11,21 @@ import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { Profile } from "@/types/auth";
-import { useQuery } from "@tanstack/react-query";
-import { Pencil, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { Operasi } from "@/validations/operasi-validation";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  ArrowBigUpDash,
+  ArrowUp,
+  ArrowUpCircle,
+  Pencil,
+  Trash2,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export default function OperasiMesinManagement() {
   const supabase = createClient();
+  const queryClient = useQueryClient();
   const {
     currentPage,
     currentLimit,
@@ -51,6 +59,7 @@ export default function OperasiMesinManagement() {
       return result;
     },
   });
+
   const filteredData = useMemo(() => {
     return (operasi_mesin?.data || []).map((mesin, index) => {
       if (mesin.waktu_Selesai === null) {
@@ -72,27 +81,48 @@ export default function OperasiMesinManagement() {
         mesin.waktu_mulai,
         mesin.waktu_selesai,
         <DropdownAction
-          menu={[
-            {
-              label: (
-                <span className="flex item-center gap-2">
-                  <Pencil />
-                  Edit
-                </span>
-              ),
-              action: () => {},
-            },
-            {
-              label: (
-                <span className="flex item-center gap-2">
-                  <Trash2 className="text-red-400" />
-                  Delete
-                </span>
-              ),
-              variant: "destructive",
-              action: () => {},
-            },
-          ]}
+          menu={
+            mesin.status_proses === "berjalan"
+              ? [
+                  {
+                    label: (
+                      <span className="flex item-center gap-2">
+                        <ArrowUpCircle className="size-5" />
+                        Update Status
+                      </span>
+                    ),
+                    action: async () => {
+                      const toastId = toast.loading("Memproses...");
+                      console.log(
+                        "ID yang dikirim:",
+                        mesin.id_penggunaan_mesin,
+                      );
+                      const { error } = await supabase
+                        .from("penggunaan_mesin")
+                        .update({ status_proses: "selesai" })
+                        .eq("id_penggunaan_mesin", mesin.id_penggunaan_mesin)
+                        .select();
+
+                      if (error) {
+                        toast.error("Gagal update status: " + error.message, {
+                          id: toastId,
+                        });
+                      } else {
+                        toast.success(
+                          "Status berhasil diupdate menjadi selesai!",
+                          {
+                            id: toastId,
+                          },
+                        );
+                        queryClient.invalidateQueries({
+                          queryKey: ["operasi_mesin"],
+                        });
+                      }
+                    },
+                  },
+                ]
+              : []
+          }
         />,
       ];
     });

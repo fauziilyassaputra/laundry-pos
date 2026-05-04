@@ -8,6 +8,7 @@ import { HEADER_TABLE_PESANAN } from "@/constants/pesanan-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, ScrollText, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -15,6 +16,7 @@ import { useMemo } from "react";
 import { toast } from "sonner";
 
 export default function PesananManagement() {
+  const profile = useAuthStore((state) => state.profile);
   const supabase = createClient();
   const {
     currentPage,
@@ -31,6 +33,7 @@ export default function PesananManagement() {
         .from("pesanan")
         .select("*", { count: "exact" })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
+        .eq("id_user", profile?.id)
         .order("created_at");
       if (currentSearch) {
         query.or(
@@ -46,6 +49,7 @@ export default function PesananManagement() {
 
       return result;
     },
+    enabled: !!profile?.id,
   });
   const filteredData = useMemo(() => {
     return (pesanan_pesanan?.data || []).map((pesanan, index) => {
@@ -59,19 +63,18 @@ export default function PesananManagement() {
         currentLimit * (currentPage - 1) + index + 1,
         pesanan.id_pesanan,
         pesanan.id_pelanggan,
-        pesanan.id_user,
         pesanan.id_layanan,
 
         <div
           className={cn("px-2 py-1 rounded-full text-white w-fit ", {
             "bg-green-600":
               pesanan.status_pesanan === "diterima" ||
-              "selesai dicuci" ||
-              "selesai dikeringkan",
+              pesanan.status_pesanan === "selesai dicuci" ||
+              pesanan.status_pesanan === "selesai dikeringkan",
             "bg-red-600":
               pesanan.status_pesanan === "dicuci" ||
-              "dikeringkan" ||
-              "di setrika",
+              pesanan.status_pesanan === "dikeringkan" ||
+              pesanan.status_pesanan === "disetrika",
             "bg-yellow-500": pesanan.status_pesanan === "selesai",
             "bg-gray-500": pesanan.status_pesanan === "diambil",
           })}

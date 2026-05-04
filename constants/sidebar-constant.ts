@@ -20,7 +20,12 @@ export const SIDEBAR_MENU_LIST = {
     { title: "Pelanggan", url: "/pelanggan", icon: Tags },
     { title: "User", url: "/admin/user", icon: User },
   ],
-  operator: [],
-  kitchen: [],
+  operator: [
+    { title: "Pesanan", url: "/pesanan", icon: Album },
+    { title: "Operasi Mesin", url: "/operator/operasi", icon: Radius },
+    { title: "Mesin", url: "/operator/mesin", icon: WashingMachine },
+    { title: "Layanan", url: "/layanan", icon: HandHeart },
+  ],
+  cashier: [],
 };
 export type SidebarMenuKey = keyof typeof SIDEBAR_MENU_LIST;

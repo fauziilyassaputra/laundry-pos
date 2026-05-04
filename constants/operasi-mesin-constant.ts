@@ -8,3 +8,13 @@ export const HEADER_TABLE_OPERASI = [
   "Waktu selesai operasi",
   "Action",
 ];
+
+export const STATUS_OPERASI_LIST = [{ value: "selesai", label: "Selesai" }];
+
+export const INITIAL_STATE_OPERASI = {
+  status: "idle",
+  errors: {
+    status_proses: [],
+    _form: [],
+  },
+};

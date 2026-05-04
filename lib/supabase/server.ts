@@ -14,8 +14,8 @@ export async function createClient({
     environment;
 
   return createServerClient(
-    SUPABASE_URL,
-    isAdmin ? SUPABASE_SERVICE_ROLE_KEY : SUPABASE_PUBLISHABLE_KEY,
+    SUPABASE_URL!,
+    isAdmin ? SUPABASE_SERVICE_ROLE_KEY! : SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {

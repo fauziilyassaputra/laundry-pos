@@ -14,7 +14,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
-export default function MesinManagement() {
+export default function LayananManagement() {
   const supabase = createClient();
   const {
     currentPage,
@@ -40,7 +40,6 @@ export default function MesinManagement() {
         );
       }
       const result = await query;
-
       if (result.error)
         toast.error("get mesin data failed: ", {
           description: result.error.message,
