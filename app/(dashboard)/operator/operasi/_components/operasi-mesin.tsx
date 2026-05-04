@@ -2,7 +2,12 @@
 import DataTable from "@/components/common/data-table";
 import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_MESIN } from "@/constants/mesin-constant";
 import { HEADER_TABLE_OPERASI } from "@/constants/operasi-mesin-constant";
@@ -11,7 +16,7 @@ import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { Profile } from "@/types/auth";
-import { Operasi } from "@/validations/operasi-validation";
+
 import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowBigUpDash,
@@ -22,6 +27,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import CreateOperasi from "./create-operasi";
 
 export default function OperasiMesinManagement() {
   const supabase = createClient();
@@ -133,7 +139,7 @@ export default function OperasiMesinManagement() {
       ? Math.ceil(operasi_mesin.count / currentLimit)
       : 0;
   }, [operasi_mesin]);
-
+  const [openCreateOrder, setOpenCreateOrder] = useState(false);
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
@@ -143,10 +149,15 @@ export default function OperasiMesinManagement() {
             placeholder="Search by name"
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
-          <Dialog>
+          <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
             <DialogTrigger asChild>
-              <Button variant="outline">Create</Button>
+              <DialogTitle>
+                <Button variant="outline">Create</Button>
+              </DialogTitle>
             </DialogTrigger>
+            <DialogContent className="max-h-50 overflow-y-auto">
+              <CreateOperasi closeDialog={() => setOpenCreateOrder(false)} />
+            </DialogContent>
           </Dialog>
         </div>
       </div>

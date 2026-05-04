@@ -1,3 +1,4 @@
+"use server";
 import { createClient } from "@/lib/supabase/server";
 import { PesananFormState } from "@/types/pesanan";
 import { pesananFormSchema } from "@/validations/pesanan-validation";
@@ -11,7 +12,6 @@ export async function createPesanan(
     id_pelanggan: formData.get("id_pelanggan"),
     id_layanan: formData.get("id_layanan"),
     total_harga: formData.get("total_harga"),
-    tanggal_estimasi_selesai: formData.get("tanggal_estimasi_selesai"),
     tipe_pesanan: formData.get("tipe_pesanan"),
     catatan: formData.get("catatan"),
   });
@@ -38,9 +38,6 @@ export async function createPesanan(
   }
 
   const totalHargaNumber = parseFloat(rawData.total_harga);
-  const estimasiSelesaiISO = new Date(
-    rawData.tanggal_estimasi_selesai!,
-  ).toISOString();
 
   const { data: newOrder, error: insertError } = await supabase
     .from("pesanan")
@@ -52,7 +49,6 @@ export async function createPesanan(
         tipe_pesanan: rawData.tipe_pesanan,
         total_harga: totalHargaNumber,
         status_pesanan: "diterima",
-        tanggal_estimasi_selesai: estimasiSelesaiISO,
         catatan: rawData.catatan || null,
       },
     ])

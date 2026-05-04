@@ -2,7 +2,12 @@
 import DataTable from "@/components/common/data-table";
 import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_PESANAN } from "@/constants/pesanan-constant";
 import useDataTable from "@/hooks/use-table";
@@ -12,8 +17,9 @@ import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, ScrollText, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import DialogCreatePesanan from "./create-pesanan";
 
 export default function PesananManagement() {
   const profile = useAuthStore((state) => state.profile);
@@ -51,6 +57,7 @@ export default function PesananManagement() {
     },
     enabled: !!profile?.id,
   });
+
   const filteredData = useMemo(() => {
     return (pesanan_pesanan?.data || []).map((pesanan, index) => {
       // if (pesanan.catatan === null) {
@@ -125,7 +132,7 @@ export default function PesananManagement() {
       ? Math.ceil(pesanan_pesanan.count / currentLimit)
       : 0;
   }, [pesanan_pesanan]);
-
+  const [openCreateOrder, setOpenCreateOrder] = useState(false);
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
@@ -135,10 +142,17 @@ export default function PesananManagement() {
             placeholder="Search by name"
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
-          <Dialog>
+          <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
             <DialogTrigger asChild>
-              <Button variant="outline">Create</Button>
+              <DialogTitle>
+                <Button variant="outline">Create</Button>
+              </DialogTitle>
             </DialogTrigger>
+            <DialogContent className="max-h-50 overflow-y-auto">
+              <DialogCreatePesanan
+                closeDialog={() => setOpenCreateOrder(false)}
+              />
+            </DialogContent>
           </Dialog>
         </div>
       </div>

@@ -22,6 +22,9 @@ import {
 import FormInput from "@/components/common/form-input";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import FormSelect from "@/components/common/form-select";
+import { useQuery } from "@tanstack/react-query";
+import { createClient } from "@/lib/supabase/client";
 
 export default function DialogCreatePesanan({
   closeDialog,
@@ -49,7 +52,8 @@ export default function DialogCreatePesanan({
   useEffect(() => {
     if (createPesananState?.status === "error") {
       toast.error("Create pesanan Failed ", {
-        description: createPesananState.errors?._form?.[0],
+        description:
+          createPesananState.message || createPesananState.errors?._form?.[0],
       });
     }
 
@@ -60,6 +64,42 @@ export default function DialogCreatePesanan({
     }
   }, [createPesananState]);
 
+  const supabase = createClient();
+
+  const { data: pelangganData, isLoading: loadPelanggan } = useQuery({
+    queryKey: ["pelanggan_list"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("pelanggan")
+        .select("id_pelanggan, nama_pelanggan");
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: layananData, isLoading: loadLayanan } = useQuery({
+    queryKey: ["layanan_list"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("layanan")
+        .select("id_layanan, nama_layanan");
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const pilihanPelangggan = pelangganData?.map((pelanggan) => ({
+    label: pelanggan.nama_pelanggan,
+    value: pelanggan.id_pelanggan,
+  }));
+
+  const pilihanLayanan = layananData?.map((layanan) => ({
+    label: layanan.nama_layanan,
+    value: layanan.id_layanan,
+  }));
+
   return (
     <DialogContent className="sm:max-w-106.25 max-h-[90vh]">
       <DialogHeader>
@@ -67,13 +107,46 @@ export default function DialogCreatePesanan({
         <DialogDescription>Tambahkan pesanan dari customer</DialogDescription>
       </DialogHeader>
       <form onSubmit={onSubmit} className="space-y-4 ">
-        <div className="space-y-4 max-h-[50vh] p-1 overflow-y-auto">
-          {/* <FormInput
+        <div className="space-y-4 max-h-[20vh] p-1 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-4">
+            <FormSelect
+              form={form}
+              name="id_pelanggan"
+              label={loadPelanggan ? "Loading Pelanggan..." : "Pilih Pelanggan"}
+              selectItem={pilihanPelangggan || []}
+            />
+            <FormSelect
+              form={form}
+              name="id_layanan"
+              label={loadLayanan ? "Loading Layanan..." : "Pilih Layanan"}
+              selectItem={pilihanLayanan || []}
+            />
+
+            <FormSelect
+              form={form}
+              name="tipe_pesanan"
+              label="Tipe Pesanan"
+              selectItem={[
+                { label: "Ambil Pesanan", value: "ambil pesanan" },
+                { label: "Antar Pesanan", value: "antar pesanan" },
+              ]}
+            />
+
+            <FormInput
+              form={form}
+              name="total_harga"
+              label="Total Harga"
+              type="number"
+              placeHolder=" Default: 0"
+            />
+          </div>
+
+          <FormInput
             form={form}
-            name="customer_name"
-            label="Customer name"
-            placeHolder="Insert customer name here"
-          /> */}
+            name="catatan"
+            label="Catatan Tambahan"
+            type="textarea"
+          />
         </div>
 
         <DialogFooter>

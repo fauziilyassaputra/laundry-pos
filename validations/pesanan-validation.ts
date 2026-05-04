@@ -6,7 +6,6 @@ export const pesananFormSchema = z.object({
   tipe_pesanan: z.string().min(1, "wajib diisi"),
   total_harga: z.string().min(1, "wajib diisi"),
   catatan: z.string().optional(),
-  tanggal_estimasi_selesai: z.string().optional(),
 });
 
 export type pesananSchema = z.infer<typeof pesananFormSchema>;

@@ -1,11 +1,10 @@
 import z from "zod";
 
-export const operasiSchemaForm = z.object({
-  id: z.string().min(1, "ID mesin tidak ditemukan"),
-});
-export const operasiSchema = z.object({
-  id: z.string(),
+export const operasiFormSchema = z.object({
+  id_pesanan: z.string().min(1, "Harus diisi"),
+  id_mesin: z.string().min(1, "Harus diisi"),
+  status_proses: z.string().min(1, "Harus diisi"),
+  waktu_mulai: z.string().min(1, "Harus diisi"),
 });
 
-export type OperasiSchema = z.infer<typeof operasiSchema>;
-export type Operasi = z.infer<typeof operasiSchema> & { id: string };
+export type operasiSchema = z.infer<typeof operasiFormSchema>;

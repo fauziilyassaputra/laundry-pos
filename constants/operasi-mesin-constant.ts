@@ -9,12 +9,20 @@ export const HEADER_TABLE_OPERASI = [
   "Action",
 ];
 
-export const STATUS_OPERASI_LIST = [{ value: "selesai", label: "Selesai" }];
+export const INITIAL_OPERASI = {
+  id_pesanan: "",
+  id_mesin: "",
+  status_proses: "",
+  waktu_mulai: "",
+};
 
 export const INITIAL_STATE_OPERASI = {
   status: "idle",
   errors: {
+    id_pesanan: [],
+    id_mesin: [],
     status_proses: [],
+    waktu_mulai: [],
     _form: [],
   },
 };

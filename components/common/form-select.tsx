@@ -27,11 +27,15 @@ export default function FormSelect<T extends FieldValues>({
     <Controller
       control={form.control}
       name={name}
-      render={({ field: { onChange, ...rest }, fieldState }) => (
+      render={({ field: { onChange, value, ...rest }, fieldState }) => (
         <Field>
           <FieldLabel>{label}</FieldLabel>
           <FieldContent>
-            <Select {...rest} onValueChange={onChange}>
+            <Select
+              {...rest}
+              onValueChange={onChange}
+              value={value?.toString() || ""}
+            >
               <SelectTrigger
                 className={cn("w-full", {
                   "border-red-500": form.formState.errors[name]?.message,
@@ -44,8 +48,8 @@ export default function FormSelect<T extends FieldValues>({
                   <SelectLabel>{label}</SelectLabel>
                   {selectItem.map((item) => (
                     <SelectItem
-                      key={item.label}
-                      value={item.value}
+                      key={item.value}
+                      value={String(item.value)}
                       disabled={item.disabled}
                       className="capitalize"
                     >
