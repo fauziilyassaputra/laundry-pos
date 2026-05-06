@@ -10,9 +10,5 @@ export default async function ItemCucianPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return (
-    <div className="">
-      <ItemCucianManagement id={id} />
-    </div>
-  );
+  return <ItemCucianManagement id={id} />;
 }

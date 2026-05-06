@@ -4,6 +4,7 @@ import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogTitle,
   DialogTrigger,
@@ -21,6 +22,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreateCucian from "./create-cucian";
 import CardCucian from "./card-cucian";
+import CardStruk from "./struk";
 
 export default function ItemCucianManagement({ id: id }: { id: string }) {
   const supabase = createClient();
@@ -76,22 +78,25 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
   }, [item_cucian]);
   const [openCreateOrder, setOpenCreateOrder] = useState(false);
   return (
-    <div className="w-full">
-      <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
+    <div className="w-full flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-4">
         <h1 className="text-2xl font-bold">Cucian Management</h1>
-      </div>
-      <div className="flex flex-col lg:flex-row gap-4 justify-between w-full">
-        <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
+
+        <Dialog>
           <DialogTrigger asChild>
-            <DialogTitle>
-              <Button variant="outline">Create</Button>
-            </DialogTitle>
+            <Button variant="default" className="bg-slate-800">
+              Lihat Struk
+            </Button>
           </DialogTrigger>
-          <DialogContent className="max-h-50 overflow-y-auto">
-            <CreateCucian closeDialog={() => setOpenCreateOrder(false)} />
+
+          <DialogContent className="max-w-md bg-transparent border-none shadow-none p-0">
+            <DialogTitle className="sr-only">Tampilan Struk</DialogTitle>
+            <CardStruk id={id} item_cucian={item_cucian?.data} />
           </DialogContent>
         </Dialog>
-        <div className="w-2/3">
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full">
+        <div className="lg:col-span-2 w-full overflow-hidden">
           <DataTable
             header={HEADER_TABLE_CUCIAN}
             data={filteredData}
@@ -103,7 +108,7 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
             onChangeLimit={handleChangeLimit}
           />
         </div>
-        <div className="w-1/3">
+        <div className="lg:col-span-1 w-full sticky top-4">
           <CardCucian id={id} />
         </div>
       </div>

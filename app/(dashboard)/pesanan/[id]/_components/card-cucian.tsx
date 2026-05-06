@@ -100,6 +100,7 @@ export default function CardCucian({ id }: { id: string }) {
               </span>
             </p>
           </div>
+          <Separator />
           <div className="">
             <p>
               Total Harga:

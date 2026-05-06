@@ -127,7 +127,7 @@ export default function CreateCucian({
         </div>
 
         <DialogFooter>
-          <DialogClose>
+          <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button type="submit">
