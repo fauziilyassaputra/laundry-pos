@@ -127,7 +127,15 @@ export default function OperasiMesinManagement() {
                     },
                   },
                 ]
-              : []
+              : [
+                  {
+                    label: (
+                      <span className="text-muted-foreground disabled">
+                        Operasi selesai
+                      </span>
+                    ),
+                  },
+                ]
           }
         />,
       ];

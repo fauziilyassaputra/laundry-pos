@@ -12,7 +12,6 @@ export const HEADER_TABLE_OPERASI = [
 export const INITIAL_OPERASI = {
   id_pesanan: "",
   id_mesin: "",
-  status_proses: "",
   waktu_mulai: "",
 };
 
@@ -21,7 +20,6 @@ export const INITIAL_STATE_OPERASI = {
   errors: {
     id_pesanan: [],
     id_mesin: [],
-    status_proses: [],
     waktu_mulai: [],
     _form: [],
   },

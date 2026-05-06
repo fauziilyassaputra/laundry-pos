@@ -4,6 +4,7 @@ export type authFormState = {
     email?: string[];
     password?: string[];
     nama?: string[];
+    jabatan?: string[];
     nomor_telepon?: string[];
     avatar_url?: string[];
     _form?: string[];

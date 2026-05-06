@@ -9,12 +9,14 @@ import { HEADER_TABLE_MESIN } from "@/constants/mesin-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { toast } from "sonner";
 
 export default function LayananManagement() {
+  const profile = useAuthStore((state) => state.profile);
   const supabase = createClient();
   const {
     currentPage,
@@ -56,29 +58,31 @@ export default function LayananManagement() {
         layanan.nama_layanan,
         layanan.harga_perkilo,
         layanan.estimasi_hari,
-        <DropdownAction
-          menu={[
-            {
-              label: (
-                <span className="flex item-center gap-2">
-                  <Pencil />
-                  Edit
-                </span>
-              ),
-              action: () => {},
-            },
-            {
-              label: (
-                <span className="flex item-center gap-2">
-                  <Trash2 className="text-red-400" />
-                  Delete
-                </span>
-              ),
-              variant: "destructive",
-              action: () => {},
-            },
-          ]}
-        />,
+        profile?.jabatan === "admin" && (
+          <DropdownAction
+            menu={[
+              {
+                label: (
+                  <span className="flex item-center gap-2">
+                    <Pencil />
+                    Edit
+                  </span>
+                ),
+                action: () => {},
+              },
+              {
+                label: (
+                  <span className="flex item-center gap-2">
+                    <Trash2 className="text-red-400" />
+                    Delete
+                  </span>
+                ),
+                variant: "destructive",
+                action: () => {},
+              },
+            ]}
+          />
+        ),
       ];
     });
   }, [layanan_layanan]);
@@ -100,7 +104,9 @@ export default function LayananManagement() {
           />
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline">Create</Button>
+              {profile?.jabatan === "admin" && (
+                <Button variant="outline">Create</Button>
+              )}
             </DialogTrigger>
           </Dialog>
         </div>

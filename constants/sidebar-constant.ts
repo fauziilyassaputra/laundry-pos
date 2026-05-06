@@ -26,6 +26,10 @@ export const SIDEBAR_MENU_LIST = {
     { title: "Mesin", url: "/operator/mesin", icon: WashingMachine },
     { title: "Layanan", url: "/layanan", icon: HandHeart },
   ],
-  cashier: [],
+  cashier: [
+    { title: "Pesanan", url: "/pesanan", icon: Album },
+    { title: "Pembayaran", url: "/cashier/pembayaran", icon: CircleDollarSign },
+    { title: "Pelanggan", url: "/pelanggan", icon: Tags },
+  ],
 };
 export type SidebarMenuKey = keyof typeof SIDEBAR_MENU_LIST;

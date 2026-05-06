@@ -25,12 +25,14 @@ import FormSelect from "@/components/common/form-select";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import FormInput from "@/components/common/form-input";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function CreateOperasi({
   closeDialog,
 }: {
   closeDialog: () => void;
 }) {
+  const profile = useAuthStore((state) => state.profile);
   const form = useForm<operasiSchema>({
     resolver: zodResolver(operasiFormSchema),
     defaultValues: INITIAL_OPERASI,
@@ -71,7 +73,8 @@ export default function CreateOperasi({
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pesanan")
-        .select("id_pesanan");
+        .select("id_pesanan, status_pesanan")
+        .eq("id_user", profile?.id);
 
       if (error) throw error;
       return data;
@@ -83,7 +86,7 @@ export default function CreateOperasi({
     queryFn: async () => {
       const { data, error } = await supabase
         .from("mesin")
-        .select("id_mesin, nama_mesin")
+        .select("id_mesin, tipe_mesin, nama_mesin")
         .eq("status_mesin", "ready");
 
       if (error) throw error;
@@ -92,12 +95,12 @@ export default function CreateOperasi({
   });
 
   const pilihanPesanan = pesananData?.map((pesanan) => ({
-    label: pesanan.id_pesanan,
+    label: `${pesanan.id_pesanan} (${pesanan.status_pesanan})`,
     value: pesanan.id_pesanan,
   }));
 
   const pilihanMesin = mesinData?.map((mesin) => ({
-    label: mesin.nama_mesin,
+    label: `${mesin.tipe_mesin} - ${mesin.nama_mesin}`,
     value: mesin.id_mesin,
   }));
 
@@ -116,24 +119,23 @@ export default function CreateOperasi({
               form={form}
               name="id_pesanan"
               label={loadPesanan ? "Loading Pesanan..." : "Pilih Pesanan"}
-              selectItem={pilihanPesanan || []}
+              selectItem={
+                pilihanPesanan || [
+                  { label: "Tidak ada pesanan yang tersedia", value: null },
+                ]
+              }
             />
             <FormSelect
               form={form}
               name="id_mesin"
               label={loadMesin ? "Loading Mesin..." : "Pilih Mesin"}
-              selectItem={pilihanMesin || []}
+              selectItem={
+                pilihanMesin || [
+                  { label: "Tidak ada mesin yang tersedia", value: null },
+                ]
+              }
             />
 
-            <FormSelect
-              form={form}
-              name="status_proses"
-              label="Status Proses"
-              selectItem={[
-                { label: "berjalan", value: "berjalan" },
-                { label: "selesai", value: "selesai" },
-              ]}
-            />
             <FormInput
               form={form}
               name="waktu_mulai"

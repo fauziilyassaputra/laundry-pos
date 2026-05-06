@@ -2,7 +2,12 @@
 import DataTable from "@/components/common/data-table";
 import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_USER } from "@/constants/user-constant";
 import useDataTable from "@/hooks/use-table";
@@ -10,8 +15,9 @@ import { createClient } from "@/lib/supabase/client";
 import { Profile } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import CreateUser from "./create-user";
 
 export default function UserManagement() {
   const supabase = createClient();
@@ -81,7 +87,7 @@ export default function UserManagement() {
       ? Math.ceil(users.count / currentLimit)
       : 0;
   }, [users]);
-
+  const [openCreateOrder, setOpenCreateOrder] = useState(false);
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
@@ -91,10 +97,15 @@ export default function UserManagement() {
             placeholder="Search by name"
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
-          <Dialog>
+          <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
             <DialogTrigger asChild>
-              <Button variant="outline">Create</Button>
+              <DialogTitle>
+                <Button variant="outline">Create</Button>
+              </DialogTitle>
             </DialogTrigger>
+            <DialogContent className="max-h-50 overflow-y-auto">
+              <CreateUser closeDialog={() => setOpenCreateOrder(false)} />
+            </DialogContent>
           </Dialog>
         </div>
       </div>

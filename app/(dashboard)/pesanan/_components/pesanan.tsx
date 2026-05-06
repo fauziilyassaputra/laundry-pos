@@ -35,14 +35,16 @@ export default function PesananManagement() {
   const { data: pesanan_pesanan, isLoading } = useQuery({
     queryKey: ["pesanan_pesanan", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
-      const query = supabase
+      let query = supabase
         .from("pesanan")
         .select("*", { count: "exact" })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
-        .eq("id_user", profile?.id)
         .order("created_at");
+      if (profile?.jabatan === "operator") {
+        query = query.eq("id_user", profile?.id);
+      }
       if (currentSearch) {
-        query.or(
+        query = query.or(
           `id_pesanan.ilike.%${currentSearch}%,status_pesanan.ilike.%${currentSearch}%,total_harga.ilike.%${currentSearch}%,tipe_pesanan.ilike.%${currentSearch}%`,
         );
       }

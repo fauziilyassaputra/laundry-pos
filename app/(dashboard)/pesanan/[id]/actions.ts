@@ -1,17 +1,18 @@
-"use server";
+"use server"
 import { createClient } from "@/lib/supabase/server";
-import { OperasiFormState } from "@/types/operasi";
-import { operasiFormSchema } from "@/validations/operasi-validation";
+import { CucianFormState } from "@/types/cucian";
+import { cucianFormSchema } from "@/validations/cucian-validation";
 import { revalidatePath } from "next/cache";
 
-export async function createOperasi(
-  prevState: OperasiFormState,
+export async function createCucian(
+  prevState: CucianFormState,
   formData: FormData,
 ) {
-  const validatedFields = operasiFormSchema.safeParse({
+  const validatedFields = cucianFormSchema.safeParse({
     id_pesanan: formData.get("id_pesanan") as string,
-    id_mesin: formData.get("id_mesin") as string,
-    waktu_mulai: formData.get("waktu_mulai") as string,
+    jenis_pakaian: formData.get("jenis_pakaian") as string,
+    berat_kg: formData.get("berat_kg") as string,
+    kondisi_pakaian: formData.get("kondisi_pakaian") as string,
   });
   if (!validatedFields.success) {
     return {
@@ -36,16 +37,16 @@ export async function createOperasi(
   }
 
   const { data: newOrder, error: insertError } = await supabase
-    .from("penggunaan_mesin")
+    .from("item_cucian")
     .insert([
       {
         id_pesanan: rawData.id_pesanan,
-        id_mesin: rawData.id_mesin,
-        status_proses: "berjalan",
-        waktu_mulai: rawData.waktu_mulai,
+        jenis_pakaian: rawData.jenis_pakaian,
+        berat_kg: rawData.berat_kg,
+        kondisi_cucian: rawData.kondisi_cucian,
       },
     ])
-    .select("id_penggunaan_mesin")
+    .select("id_cucian")
     .single();
 
   if (insertError) {
@@ -55,11 +56,11 @@ export async function createOperasi(
     };
   }
 
-  revalidatePath("/dashboard/operator/operasi");
+  revalidatePath(`/dashboard/pesanan/${rawData.id_pesanan}`);
 
   return {
     status: "success",
     message: "Operasi mesin baru berhasil dibuat!",
-    newOrderId: newOrder.id_penggunaan_mesin,
+    newOrderId: newOrder.id_cucian,
   };
 }
