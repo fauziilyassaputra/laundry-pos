@@ -150,11 +150,10 @@ export default function PesananManagement() {
                 <Button variant="outline">Create</Button>
               </DialogTitle>
             </DialogTrigger>
-            <DialogContent className="max-h-50 overflow-y-auto">
-              <DialogCreatePesanan
-                closeDialog={() => setOpenCreateOrder(false)}
-              />
-            </DialogContent>
+
+            <DialogCreatePesanan
+              closeDialog={() => setOpenCreateOrder(false)}
+            />
           </Dialog>
         </div>
       </div>

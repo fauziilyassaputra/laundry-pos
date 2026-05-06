@@ -2,7 +2,7 @@
 import DataTable from "@/components/common/data-table";
 import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_PELANGGAN } from "@/constants/pelanggan-constant";
 import useDataTable from "@/hooks/use-table";
@@ -10,8 +10,9 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import CreatePelanggan from "./create-pelanggan";
 
 export default function PelangganManagement() {
   const supabase = createClient();
@@ -33,7 +34,7 @@ export default function PelangganManagement() {
         .order("created_at");
       if (currentSearch) {
         query.or(
-          `status_pesanan.ilike.%${currentSearch}%,nomor_telepon.ilike.%${currentSearch}%,alamat_rumah.ilike.%${currentSearch}%`,
+          `nama_pelanggan.ilike.%${currentSearch}%,nomor_telepon.ilike.%${currentSearch}%,alamat_rumah.ilike.%${currentSearch}%`,
         );
       }
       const result = await query;
@@ -96,7 +97,7 @@ export default function PelangganManagement() {
       ? Math.ceil(pelanggan_pelanggan.count / currentLimit)
       : 0;
   }, [pelanggan_pelanggan]);
-
+  const [openCreateOrder, setOpenCreateOrder] = useState(false);
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
@@ -106,10 +107,11 @@ export default function PelangganManagement() {
             placeholder="Search by name"
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
-          <Dialog>
+          <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
+            <CreatePelanggan closeDialog={() => setOpenCreateOrder(false)} />
           </Dialog>
         </div>
       </div>
