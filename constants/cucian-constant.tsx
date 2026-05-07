@@ -3,14 +3,14 @@ export const HEADER_TABLE_CUCIAN = [
   "ID pesanan",
   "Jenis Pakaian",
   "Berat perkilo",
-  "Kondisi Pakaian",
+  "Kondisi cucian",
 ];
 
 export const INITIAL_CUCIAN = {
   id_pesanan: "",
   jenis_pakaian: "",
   berat_kg: "",
-  kondisi_pakaian: "",
+  kondisi_cucian: "",
 };
 
 export const INITIAL_STATE_CUCIAN = {
@@ -19,7 +19,7 @@ export const INITIAL_STATE_CUCIAN = {
     id_pesanan: [],
     jenis_pakaian: [],
     berat_kg: [],
-    kondisi_pakaian: [],
+    kondisi_cucian: [],
     _form: [],
   },
 };

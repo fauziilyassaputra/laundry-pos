@@ -1,18 +1,19 @@
 "use server";
 import { createClient } from "@/lib/supabase/server";
-import { CucianFormState } from "@/types/cucian";
-import { cucianFormSchema } from "@/validations/cucian-validation";
+import { PembayaranFormState } from "@/types/pembayaran";
+import { pembayaranFormSchema } from "@/validations/pembayaran-validation";
 import { revalidatePath } from "next/cache";
 
-export async function createCucian(
-  prevState: CucianFormState,
+export async function updatePembayaran(
+  prevState: PembayaranFormState,
   formData: FormData,
 ) {
-  const validatedFields = cucianFormSchema.safeParse({
-    id_pesanan: formData.get("id_pesanan") as string,
-    jenis_pakaian: formData.get("jenis_pakaian") as string,
-    berat_kg: formData.get("berat_kg") as string,
-    kondisi_cucian: formData.get("kondisi_cucian") as string,
+  const validatedFields = pembayaranFormSchema.safeParse({
+    id_pesanan: formData.get("id_pesanan"),
+    tanggal_bayar: formData.get("tanggal_bayar"),
+    jumlah_bayar: formData.get("jumlah_bayar"),
+    metode_bayar: formData.get("metode_bayar"),
+    status_pembayaran: formData.get("status_pembayaran"),
   });
   if (!validatedFields.success) {
     return {
@@ -37,16 +38,17 @@ export async function createCucian(
   }
 
   const { data: newOrder, error: insertError } = await supabase
-    .from("item_cucian")
-    .insert([
+    .from("pembayaran")
+    .update([
       {
         id_pesanan: rawData.id_pesanan,
-        jenis_pakaian: rawData.jenis_pakaian,
-        berat_kg: rawData.berat_kg,
-        kondisi_cucian: rawData.kondisi_cucian,
+        tanggal_bayar: rawData.tanggal_bayar,
+        jumlah_bayar: rawData.jumlah_bayar,
+        metode_bayar: rawData.metode_bayar,
+        status_pembayaran: rawData.status_pembayaran,
       },
     ])
-    .select("id_cucian")
+    .select("id_pembayaran")
     .single();
 
   if (insertError) {
@@ -56,11 +58,11 @@ export async function createCucian(
     };
   }
 
-  revalidatePath(`/dashboard/pesanan/${rawData.id_pesanan}`);
+  revalidatePath("cashier/pembayaran");
 
   return {
     status: "success",
-    message: "Operasi mesin baru berhasil dibuat!",
-    newOrderId: newOrder.id_cucian,
+    message: "Pesanan baru berhasil dibuat!",
+    newOrderId: newOrder.id_pembayaran,
   };
 }

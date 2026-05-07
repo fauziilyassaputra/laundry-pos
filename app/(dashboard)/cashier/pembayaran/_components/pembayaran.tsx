@@ -13,8 +13,13 @@ import { cn } from "@/lib/utils";
 import { Profile } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import UpdatePembayaran from "./update-pembayaran";
+import {
+  Pembayaran,
+  pembayaranSchema,
+} from "@/validations/pembayaran-validation";
 
 export default function PembayaranManagement() {
   const supabase = createClient();
@@ -51,6 +56,16 @@ export default function PembayaranManagement() {
       return result;
     },
   });
+
+  const [selectedAction, setSelectedAction] = useState<{
+    data: Pembayaran;
+    type: "update" | "delete";
+  } | null>(null);
+
+  const handleChangeAction = (open: boolean) => {
+    if (!open) setSelectedAction(null);
+  };
+
   const filteredData = useMemo(() => {
     return (pembayaran?.data || []).map((bayar, index) => {
       if (bayar.metode_bayar === null) {
@@ -87,7 +102,9 @@ export default function PembayaranManagement() {
                   Edit
                 </span>
               ),
-              action: () => {},
+              action: () => {
+                setSelectedAction({ data: bayar, type: "update" });
+              },
             },
             {
               label: (
@@ -136,6 +153,11 @@ export default function PembayaranManagement() {
         totalPage={totalPages}
         currentLimit={currentLimit}
         onChangeLimit={handleChangeLimit}
+      />
+      <UpdatePembayaran
+        open={selectedAction !== null && selectedAction.type === "update"}
+        currentData={selectedAction?.data}
+        handleChangeAction={handleChangeAction}
       />
     </div>
   );
