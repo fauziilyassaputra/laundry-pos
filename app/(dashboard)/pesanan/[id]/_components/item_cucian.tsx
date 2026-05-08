@@ -80,7 +80,8 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-4">
-        <h1 className="text-2xl font-bold">Cucian Management</h1>
+        <div>
+        <h1 className="text-2xl font-bold mb-2">Cucian Management</h1>
 
         <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
           <DialogTrigger asChild>
@@ -92,10 +93,11 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
             <CreateCucian closeDialog={() => setOpenCreateOrder(false)} />
           </DialogContent>
         </Dialog>
-
+        </div>
+       
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="default" className="bg-slate-800">
+            <Button variant="default" className="bg-slate-800 dark:bg-white">
               Lihat Struk
             </Button>
           </DialogTrigger>

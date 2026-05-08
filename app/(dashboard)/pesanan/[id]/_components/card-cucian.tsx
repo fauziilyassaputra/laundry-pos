@@ -86,9 +86,9 @@ export default function CardCucian({ id }: { id: string }) {
             />
           </div>
         </div>
-        <Separator />
-        <div className="space-y-4">
-          <h3 className="text-md font-semibold">Ringkasan Pembayaran</h3>
+        <Separator className="my-4" />
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Ringkasan Pembayaran</h3>
           <div className="space-y-2">
             <p>
               Status Pembayaran:
@@ -100,7 +100,6 @@ export default function CardCucian({ id }: { id: string }) {
               </span>
             </p>
           </div>
-          <Separator />
           <div className="">
             <p>
               Total Harga:
@@ -109,7 +108,7 @@ export default function CardCucian({ id }: { id: string }) {
                 Rp.
                 {loadpesanan
                   ? "Loading..."
-                  : pesananData?.[0].total_harga || ""}
+                  : pesananData?.[0].total_harga || "0"}
               </span>
             </p>
           </div>

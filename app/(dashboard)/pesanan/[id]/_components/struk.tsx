@@ -67,7 +67,7 @@ export default function CardStruk({
     },
     enabled: !!pesananData?.[0]?.id_pesanan,
   });
-  console.log(pembayaranData);
+  console.log('isi pesanan: ',pesananData);
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 w-full">

@@ -32,14 +32,21 @@ export default function PesananManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
+
+  const profile = useAuthStore((state) => state.profile);
+
   const { data: pesanan_pesanan, isLoading } = useQuery({
-    queryKey: ["pesanan_pesanan", currentPage, currentLimit, currentSearch],
+    queryKey: ["pesanan_pesanan", currentPage, currentLimit, currentSearch, profile?.id, profile?.jabatan],
     queryFn: async () => {
       let query = supabase
         .from("pesanan")
         .select(`*, operator:id_user(id,nama)`, { count: "exact" })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
         .order("created_at");
+        if (profile?.jabatan === "operator"){
+          query = query.eq("id_user", profile.id)
+        }
+        
      
       if (currentSearch) {
         query = query.or(
