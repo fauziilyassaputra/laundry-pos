@@ -1,6 +1,7 @@
 export const HEADER_TABLE_PESANAN = [
   "No",
   "ID Pesanan",
+  "Nama Operator",
   "ID Pelanggan",
   "ID Layanan",
   "Status Pesanan",
@@ -14,6 +15,7 @@ export const HEADER_TABLE_PESANAN = [
 ];
 
 export const INITIAL_PESANAN = {
+  id_user: "",
   id_pelanggan: "",
   id_layanan: "",
   status_pesanan: "",
@@ -28,7 +30,7 @@ export const INITIAL_PESANAN = {
 export const INITIAL_STATE_PESANAN = {
   status: "idle",
   errors: {
-    id_pesanan: [],
+    id_user:[],
     id_pelanggan: [],
     id_layanan: [],
     status_pesanan: [],

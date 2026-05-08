@@ -9,6 +9,7 @@ export async function createPesanan(
   formData: FormData,
 ) {
   const validatedFields = pesananFormSchema.safeParse({
+    id_user: formData.get("id_user"),
     id_pelanggan: formData.get("id_pelanggan"),
     id_layanan: formData.get("id_layanan"),
     total_harga: formData.get("total_harga"),
@@ -45,7 +46,7 @@ export async function createPesanan(
       {
         id_pelanggan: rawData.id_pelanggan,
         id_layanan: rawData.id_layanan,
-        id_user: user?.id,
+        id_user: rawData.id_user || user?.id,
         tipe_pesanan: rawData.tipe_pesanan,
         total_harga: totalHargaNumber,
         status_pesanan: "diterima",

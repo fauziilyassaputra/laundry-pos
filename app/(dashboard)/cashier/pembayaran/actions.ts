@@ -37,6 +37,8 @@ export async function updatePembayaran(
     };
   }
 
+  const id_pembayaran = formData.get("id_pembayaran") as string;
+
   const { data: newOrder, error: insertError } = await supabase
     .from("pembayaran")
     .update([
@@ -48,7 +50,7 @@ export async function updatePembayaran(
         status_pembayaran: rawData.status_pembayaran,
       },
     ])
-    .select("id_pembayaran")
+    .eq("id_pembayaran", id_pembayaran)
     .single();
 
   if (insertError) {
@@ -62,7 +64,6 @@ export async function updatePembayaran(
 
   return {
     status: "success",
-    message: "Pesanan baru berhasil dibuat!",
-    newOrderId: newOrder.id_pembayaran,
+    message: "Pesanan berhasil diperbarui!",
   };
 }

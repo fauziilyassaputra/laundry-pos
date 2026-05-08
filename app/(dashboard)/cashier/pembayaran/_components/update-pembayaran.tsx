@@ -72,6 +72,9 @@ export default function UpdatePembayaran({
       toast.success("Create operasi Success");
       form.reset();
     }
+    if (handleChangeAction) {
+        handleChangeAction(false); 
+      }
   }, [updatePembayaranState]);
 
   useEffect(() => {
@@ -128,7 +131,7 @@ export default function UpdatePembayaran({
                 selectItem={[
                   { label: "Cash", value: "cash" },
                   { label: "Transfer", value: "transfer" },
-                  { label: "Credit Card", value: "credit_card" },
+                  { label: "Credit Card", value: "credit card" },
                 ]}
               />
               <FormSelect
@@ -137,8 +140,8 @@ export default function UpdatePembayaran({
                 label="Status pembayaran"
                 selectItem={[
                   { label: "Lunas", value: "lunas" },
-                  { label: "Belum Lunas", value: "belum_lunas" },
-                  { label: "Uang Muka", value: "uang_muka" },
+                  { label: "Bayar", value: "bayar" },
+                  { label: "Uang Muka", value: "uang muka" },
                 ]}
               />
             </div>

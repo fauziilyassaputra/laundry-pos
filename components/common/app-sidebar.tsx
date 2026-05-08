@@ -86,7 +86,9 @@ export default function AppSidebar() {
                 <SidebarMenuButton size="lg">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={profile.avatar_url} alt={profile.nama} />
-                    <AvatarFallback className="rounded-lg">A</AvatarFallback>
+                    <AvatarFallback className="capitalize rounded-lg">
+                      {profile.nama?.charAt(0)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="leading-tight">
                     <h4 className="truncate font-medium"> {profile.nama} </h4>
@@ -110,7 +112,7 @@ export default function AppSidebar() {
                         src={profile.avatar_url}
                         alt={profile.nama}
                       />
-                      <AvatarFallback className="rounded-lg">
+                      <AvatarFallback className="rounded-lg capitalize">
                         {profile.nama?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>

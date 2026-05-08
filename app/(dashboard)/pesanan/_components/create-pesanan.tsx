@@ -90,6 +90,21 @@ export default function DialogCreatePesanan({
     },
   });
 
+   const {data: profileData, isLoading:profileLoading} =useQuery({
+    queryKey: ["profile"],
+    queryFn: async() => {
+      const {data, error} = await supabase.from("profiles").select("id,nama").eq("jabatan", "operator");
+      if (error) throw error;
+      return data;
+    }
+  })
+
+  const pilihOperator = profileData?.map((operator) => ({
+    label: operator.nama,
+    value: operator.id,
+  }) )
+
+
   const pilihanPelangggan = pelangganData?.map((pelanggan) => ({
     label: pelanggan.nama_pelanggan,
     value: pelanggan.id_pelanggan,
@@ -120,6 +135,13 @@ export default function DialogCreatePesanan({
               name="id_layanan"
               label={loadLayanan ? "Loading Layanan..." : "Pilih Layanan"}
               selectItem={pilihanLayanan || []}
+            />
+
+            <FormSelect
+              form={form}
+              name="id_user"
+              label={profileLoading ? "Loading Operator..." : "Pilih Operator"}
+              selectItem={pilihOperator || []}
             />
 
             <FormSelect

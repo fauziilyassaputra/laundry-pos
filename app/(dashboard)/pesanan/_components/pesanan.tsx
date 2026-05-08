@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import DialogCreatePesanan from "./create-pesanan";
 
 export default function PesananManagement() {
-  const profile = useAuthStore((state) => state.profile);
+  
   const supabase = createClient();
   const {
     currentPage,
@@ -37,12 +37,10 @@ export default function PesananManagement() {
     queryFn: async () => {
       let query = supabase
         .from("pesanan")
-        .select("*", { count: "exact" })
+        .select(`*, operator:id_user(id,nama)`, { count: "exact" })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
         .order("created_at");
-      if (profile?.jabatan === "operator") {
-        query = query.eq("id_user", profile?.id);
-      }
+     
       if (currentSearch) {
         query = query.or(
           `id_pesanan.ilike.%${currentSearch}%,status_pesanan.ilike.%${currentSearch}%,total_harga.ilike.%${currentSearch}%,tipe_pesanan.ilike.%${currentSearch}%`,
@@ -57,9 +55,9 @@ export default function PesananManagement() {
 
       return result;
     },
-    enabled: !!profile?.id,
   });
 
+ 
   const filteredData = useMemo(() => {
     return (pesanan_pesanan?.data || []).map((pesanan, index) => {
       // if (pesanan.catatan === null) {
@@ -71,6 +69,7 @@ export default function PesananManagement() {
       return [
         currentLimit * (currentPage - 1) + index + 1,
         pesanan.id_pesanan,
+        pesanan.operator?.nama || "Operator tidak ditemukan",
         pesanan.id_pelanggan,
         pesanan.id_layanan,
 

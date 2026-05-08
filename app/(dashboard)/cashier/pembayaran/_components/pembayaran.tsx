@@ -80,7 +80,7 @@ export default function PembayaranManagement() {
           className={cn("px-2 py-1 rounded-full text-white w-fit capitalize", {
             "bg-green-600": bayar.status_pembayaran === "lunas",
             "bg-red-600": bayar.status_pembayaran === "bayar",
-            "bg-gray-500": bayar.status_pembayaran === "uang muka",
+            "bg-blue-400" : bayar.status_pembayaran === "uang muka",
           })}
         >
           {bayar.status_pembayaran}
@@ -105,6 +105,7 @@ export default function PembayaranManagement() {
               action: () => {
                 setSelectedAction({ data: bayar, type: "update" });
               },
+              
             },
             {
               label: (
