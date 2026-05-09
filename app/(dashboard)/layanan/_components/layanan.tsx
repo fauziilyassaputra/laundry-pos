@@ -12,8 +12,9 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import CreateLayanan from "./create-layanan";
 
 export default function LayananManagement() {
   const profile = useAuthStore((state) => state.profile);
@@ -58,7 +59,7 @@ export default function LayananManagement() {
         layanan.nama_layanan,
         layanan.harga_perkilo,
         layanan.estimasi_hari,
-        profile?.jabatan === "admin" && (
+        profile?.jabatan === "manager" && (
           <DropdownAction
             menu={[
               {
@@ -84,7 +85,7 @@ export default function LayananManagement() {
           />
         ),
       ];
-    });
+    }); 
   }, [layanan_layanan]);
 
   const totalPages = useMemo(() => {
@@ -92,6 +93,7 @@ export default function LayananManagement() {
       ? Math.ceil(layanan_layanan.count / currentLimit)
       : 0;
   }, [layanan_layanan]);
+  const [openCreateOrder, setOpenCreateOrder] = useState(false);
 
   return (
     <div className="w-full">
@@ -102,12 +104,13 @@ export default function LayananManagement() {
             placeholder="Search by name"
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
-          <Dialog>
+          <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
             <DialogTrigger asChild>
               {profile?.jabatan === "manager" && (
                 <Button variant="outline">Create</Button>
               )}
             </DialogTrigger>
+            <CreateLayanan closeDialog={() => setOpenCreateOrder(false)} />
           </Dialog>
         </div>
       </div>
