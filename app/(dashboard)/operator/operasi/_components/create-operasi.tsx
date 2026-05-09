@@ -69,29 +69,46 @@ export default function CreateOperasi({
   const supabase = createClient();
 
   const { data: pesananData, isLoading: loadPesanan } = useQuery({
-    queryKey: ["pesanan_list"],
+    queryKey: ["pesanan_list", profile?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const query =  supabase
         .from("pesanan")
         .select("id_pesanan, status_pesanan")
-        .eq("id_user", profile?.id);
+        .eq("id_user", profile?.id)
+        .not("status_pesanan", "in", '("dicuci","dikeringkan","disetrika","selesai","diambil")')
 
+        
+
+        const {data,error} = await query
       if (error) throw error;
       return data;
     },
+    enabled: !!profile?.id
   });
+  const status_pesanan = pesananData?.[0]?.status_pesanan
+  
 
   const { data: mesinData, isLoading: loadMesin } = useQuery({
-    queryKey: ["mesin_list"],
+    queryKey: ["mesin_list", status_pesanan],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query =  supabase
         .from("mesin")
         .select("id_mesin, tipe_mesin, nama_mesin")
         .eq("status_mesin", "ready");
-
+      if (status_pesanan === "diterima") {
+      query = query.eq("tipe_mesin", "washer");
+    } 
+    else if (status_pesanan === "selesai dicuci") {
+      query = query.eq("tipe_mesin", "dryer");
+    } 
+    else if (status_pesanan === "selesai dikeringkan") {
+      query = query.eq("tipe_mesin", "setrika");
+    } 
+      const {data,error} = await query
       if (error) throw error;
       return data;
     },
+    enabled: !!status_pesanan
   });
 
   const pilihanPesanan = pesananData?.map((pesanan) => ({
@@ -120,8 +137,9 @@ export default function CreateOperasi({
               name="id_pesanan"
               label={loadPesanan ? "Loading Pesanan..." : "Pilih Pesanan"}
               selectItem={
-                pilihanPesanan || [
-                  { label: "Tidak ada pesanan yang tersedia", value: null },
+                pilihanPesanan && pilihanPesanan?.length > 0 ?
+                pilihanPesanan : [
+                  { label: "Tidak ada pesanan yang siap dioperasikan", value: null  },
                 ]
               }
             />
@@ -129,8 +147,8 @@ export default function CreateOperasi({
               form={form}
               name="id_mesin"
               label={loadMesin ? "Loading Mesin..." : "Pilih Mesin"}
-              selectItem={
-                pilihanMesin || [
+              selectItem={ pilihanMesin && pilihanMesin.length > 0 ?
+                pilihanMesin : [
                   { label: "Tidak ada mesin yang tersedia", value: null },
                 ]
               }

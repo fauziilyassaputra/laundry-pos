@@ -14,8 +14,8 @@ import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
-import { useQuery } from "@tanstack/react-query";
-import { Pencil, ScrollText, Trash2 } from "lucide-react";
+import {  useQuery, useQueryClient } from "@tanstack/react-query";
+import { ArrowUpCircle, Pencil, ScrollText, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import DialogCreatePesanan from "./create-pesanan";
 export default function PesananManagement() {
   
   const supabase = createClient();
+  const queryClient = useQueryClient()
   const {
     currentPage,
     currentLimit,
@@ -116,7 +117,9 @@ export default function PesananManagement() {
           {pesanan.tipe_pesanan}
         </div>,
         <DropdownAction
-          menu={[
+          menu={
+            pesanan.status_pesanan !== "diambil" ?
+            [
             {
               label: (
                 <Link
@@ -129,6 +132,49 @@ export default function PesananManagement() {
               ),
               type: "link",
             },
+            ...(pesanan.status_pesanan === "selesai" ? [
+               { label: (
+               <span className="flex item-center gap-2">
+                        <ArrowUpCircle className="size-5" />
+                        diambil
+                      </span>
+              ),
+              action: async () => {
+                const toastId = toast.loading("Memproses...")
+                const {error} = await supabase
+                .from("pesanan")
+                .update({status_pesanan: "diambil"})
+                .eq("id_pesanan",pesanan.id_pesanan)
+                .select()
+                if (error) {
+                        toast.error("Gagal update status: " + error.message, {
+                          id: toastId,
+                        });
+                      } else {
+                        toast.success(
+                          "Status berhasil diupdate menjadi selesai!",
+                          {
+                            id: toastId,
+                          },
+                        );
+                        queryClient.invalidateQueries({
+                          queryKey: ["pesanan_pesanan"],
+                        });
+                      }
+              }
+             
+            }
+            ]: []),
+              
+            
+          ]: [
+              {
+                    label: (
+                      <span className="text-muted-foreground disabled">
+                        Operasi selesai
+                      </span>
+                    ),
+                  },
           ]}
         />,
       ];
@@ -153,7 +199,11 @@ export default function PesananManagement() {
           <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
             <DialogTrigger asChild>
               <DialogTitle>
-                <Button variant="outline">Create</Button>
+                { profile?.jabatan !== "operator" && (
+                  
+                <Button variant="outline"  
+                >Create</Button>
+                )}
               </DialogTitle>
             </DialogTrigger>
 

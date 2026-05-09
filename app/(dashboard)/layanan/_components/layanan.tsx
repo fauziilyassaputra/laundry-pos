@@ -104,7 +104,7 @@ export default function LayananManagement() {
           />
           <Dialog>
             <DialogTrigger asChild>
-              {profile?.jabatan === "admin" && (
+              {profile?.jabatan === "manager" && (
                 <Button variant="outline">Create</Button>
               )}
             </DialogTrigger>

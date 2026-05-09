@@ -8,6 +8,7 @@ import { HEADER_TABLE_MESIN } from "@/constants/mesin-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
 import { useMemo } from "react";
@@ -15,6 +16,7 @@ import { toast } from "sonner";
 
 export default function MesinManagement() {
   const supabase = createClient();
+  const profile = useAuthStore((state) => state.profile)
   const {
     currentPage,
     currentLimit,
@@ -69,7 +71,9 @@ export default function MesinManagement() {
         </div>,
         mesin.tanggal_service_terakhir,
         <DropdownAction
-          menu={[
+          menu={
+            profile?.jabatan === "manager" ? [
+                
             {
               label: (
                 <span className="flex item-center gap-2">
@@ -89,7 +93,15 @@ export default function MesinManagement() {
               variant: "destructive",
               action: () => {},
             },
-          ]}
+          
+            ] : [
+              {label: (
+                 <span>Kamu tidak punya akses</span>
+              ) 
+               
+              }
+            ]}
+    
         />,
       ];
     });
@@ -110,11 +122,14 @@ export default function MesinManagement() {
             placeholder="Search by name"
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
-          <Dialog>
+          {profile?.jabatan === "manager" && (
+<Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
           </Dialog>
+          )}
+          
         </div>
       </div>
       <DataTable

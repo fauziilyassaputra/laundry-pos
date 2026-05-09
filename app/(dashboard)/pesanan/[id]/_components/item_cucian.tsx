@@ -90,7 +90,7 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
 
           <DialogContent className="max-w-md bg-transparent border-none shadow-none p-0">
             <DialogTitle className="sr-only">Tampilan Struk</DialogTitle>
-            <CreateCucian closeDialog={() => setOpenCreateOrder(false)} />
+            <CreateCucian closeDialog={() => setOpenCreateOrder(false)} id_pesanan={id} />
           </DialogContent>
         </Dialog>
         </div>

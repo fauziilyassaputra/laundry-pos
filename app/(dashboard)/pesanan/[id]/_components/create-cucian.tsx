@@ -28,8 +28,9 @@ import { Loader2 } from "lucide-react";
 
 export default function CreateCucian({
   closeDialog,
-}: {
+id_pesanan}: {
   closeDialog: () => void;
+  id_pesanan: string
 }) {
   const form = useForm<cucianSchema>({
     resolver: zodResolver(cucianFormSchema),
@@ -67,22 +68,20 @@ export default function CreateCucian({
   const supabase = createClient();
 
   const { data: pesananData, isLoading: loadPesanan } = useQuery({
-    queryKey: ["pesanan_list"],
+    queryKey: ["pesanan_list", id_pesanan],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pesanan")
-        .select("id_pesanan");
+        .select("id_pesanan")
+        .eq("id_pesanan", id_pesanan)
+        .single();
 
       if (error) throw error;
       return data;
     },
   });
 
-  const pilihanPelangggan = pesananData?.map((pesanan) => ({
-    label: pesanan.id_pesanan,
-    value: pesanan.id_pesanan,
-  }));
-
+  
   return (
     <DialogContent className="sm:max-w-106.25 max-h-[90vh]">
       <DialogHeader>
@@ -98,7 +97,12 @@ export default function CreateCucian({
               form={form}
               name="id_pesanan"
               label={loadPesanan ? "Loading Pesanan..." : "Pilih Pesanan"}
-              selectItem={pilihanPelangggan || []}
+              selectItem={ [
+                {
+                  label: id_pesanan || "tidak ada id",
+                  value: id_pesanan || "0"
+                },
+              ] }
             />
 
             <FormInput

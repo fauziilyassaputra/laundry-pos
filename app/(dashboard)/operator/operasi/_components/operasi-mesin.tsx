@@ -28,8 +28,10 @@ import {
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreateOperasi from "./create-operasi";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function OperasiMesinManagement() {
+  const profile = useAuthStore((state) => state.profile )
   const supabase = createClient();
   const queryClient = useQueryClient();
   const {
@@ -41,19 +43,23 @@ export default function OperasiMesinManagement() {
     handleChangeSearch,
   } = useDataTable();
   const { data: operasi_mesin, isLoading } = useQuery({
-    queryKey: ["operasi_mesin", currentPage, currentLimit, currentSearch],
+    queryKey: ["operasi_mesin", currentPage, currentLimit, currentSearch, profile?.id, profile?.jabatan],
     queryFn: async () => {
-      const query = supabase
+      let query = supabase
         .from("penggunaan_mesin")
-        .select("*", { count: "exact" })
+        .select("*, pesanan!inner (id_user)", { count: "exact" })
         .range(
           (currentPage - 1) * currentLimit,
           currentPage * currentLimit - 1,
         );
+        if (profile?.jabatan === "operator" && profile?.id){
+          query = query.eq("pesanan.id_user", profile.id)
+        }
       if (currentSearch) {
         query.or(
           `id_pesanan.ilike.%${currentSearch}%,id_mesin.ilike.%${currentSearch}%,status_proses.ilike.%${currentSearch}%`,
         );
+        
       }
       const result = await query;
 
@@ -64,6 +70,7 @@ export default function OperasiMesinManagement() {
 
       return result;
     },
+    enabled: !!profile?.id,
   });
 
   const filteredData = useMemo(() => {
