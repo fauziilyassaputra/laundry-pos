@@ -11,8 +11,9 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import CreateMesin from "./create-mesin";
 
 export default function MesinManagement() {
   const supabase = createClient();
@@ -112,7 +113,7 @@ export default function MesinManagement() {
       ? Math.ceil(mesin_mesin.count / currentLimit)
       : 0;
   }, [mesin_mesin]);
-
+ const [openCreateOrder, setOpenCreateOrder] = useState(false);
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
@@ -123,10 +124,11 @@ export default function MesinManagement() {
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
           {profile?.jabatan === "manager" && (
-<Dialog>
+<Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
             <DialogTrigger asChild>
               <Button variant="outline">Create</Button>
             </DialogTrigger>
+            <CreateMesin closeDialog={() => setOpenCreateOrder(false) } />
           </Dialog>
           )}
           

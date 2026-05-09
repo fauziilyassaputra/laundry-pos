@@ -47,9 +47,9 @@ export default function CreateLayanan(
     return (
          <DialogContent className="sm:max-w-106.25 max-h-[90vh]">
       <DialogHeader>
-        <DialogTitle>Buat cucian Baru</DialogTitle>
+        <DialogTitle>Buat layanan Baru</DialogTitle>
         <DialogDescription>
-          Tambahkan cucian dari pesanan customer
+          Tambahkan layanan baru
         </DialogDescription>
       </DialogHeader>
       <form onSubmit={onSubmit} className="space-y-4 ">
