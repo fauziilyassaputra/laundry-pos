@@ -13,7 +13,7 @@ export default function useReltimePesanan(){
         .on("postgres_changes",{
             event: "*",
             schema: "public",
-            table: "pesanan"
+            table: "pesanan" 
         },
         (payload) => {
             console.log("data berubah:, ", payload)
