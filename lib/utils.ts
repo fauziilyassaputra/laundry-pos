@@ -11,3 +11,24 @@ export function getImageData(event: ChangeEvent<HTMLInputElement>) {
   const displayUrl = URL.createObjectURL(file);
   return { file, displayUrl };
 }
+
+export function formatWaktuWib(tanggalISO: string | Date | null){
+  if (!tanggalISO) return "-";
+
+  const date = new Date(tanggalISO);
+
+  if (Number.isNaN(date.getTime())) {
+    return "-"; // Tampilkan strip saja daripada membuat layar merah
+  }
+  
+  return new Intl.DateTimeFormat("id-ID",{
+    timeZone: "Asia/Jakarta",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    timeZoneName: "short"
+  }).format(date);
+}

@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_PESANAN } from "@/constants/pesanan-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn, formatWaktuWib } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import {  useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpCircle, Pencil, ScrollText, Trash2 } from "lucide-react";
@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import DialogCreatePesanan from "./create-pesanan";
+import useReltimePesanan from "./realtime-pesanan";
 
 export default function PesananManagement() {
   
@@ -43,7 +44,7 @@ export default function PesananManagement() {
         .from("pesanan")
         .select(`*, operator:id_user(id,nama)`, { count: "exact" })
         .range((currentPage - 1) * currentLimit, currentPage * currentLimit - 1)
-        .order("created_at");
+        .order("created_at", {ascending: false});
         if (profile?.jabatan === "operator"){
           query = query.eq("id_user", profile.id)
         }
@@ -65,6 +66,7 @@ export default function PesananManagement() {
     },
   });
 
+  // useReltimePesanan()
  
   const filteredData = useMemo(() => {
     return (pesanan_pesanan?.data || []).map((pesanan, index) => {
@@ -105,9 +107,9 @@ export default function PesananManagement() {
         >
           {pesanan.catatan}
         </p>,
-        pesanan.tanggal_masuk,
-        pesanan.tanggal_estimasi_selesai,
-        pesanan.tanggal_selesai,
+        formatWaktuWib(pesanan.tanggal_masuk),
+        formatWaktuWib(pesanan.tanggal_estimasi_selesai),
+        formatWaktuWib(pesanan.tanggal_selesai),
         <div
           className={cn("px-2 py-1 rounded-full text-white w-fit ", {
             "bg-blue-600": pesanan.tipe_pesanan === "ambil pesanan",

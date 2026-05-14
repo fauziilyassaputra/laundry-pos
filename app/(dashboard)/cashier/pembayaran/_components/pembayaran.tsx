@@ -9,7 +9,7 @@ import { HEADER_TABLE_PEMBAYARAN } from "@/constants/pembayaran-constant";
 import { HEADER_TABLE_USER } from "@/constants/user-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn, formatWaktuWib } from "@/lib/utils";
 import { Profile } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
@@ -92,7 +92,8 @@ export default function PembayaranManagement() {
         >
           {bayar.metode_bayar}
         </p>,
-        bayar.tanggal_bayar,
+        formatWaktuWib( bayar.tanggal_bayar),
+       
         <DropdownAction
           menu={[
             {

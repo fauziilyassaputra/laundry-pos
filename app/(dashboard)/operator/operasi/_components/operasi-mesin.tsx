@@ -14,7 +14,7 @@ import { HEADER_TABLE_OPERASI } from "@/constants/operasi-mesin-constant";
 import { HEADER_TABLE_USER } from "@/constants/user-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
-import { cn } from "@/lib/utils";
+import { cn, formatWaktuWib } from "@/lib/utils";
 import { Profile } from "@/types/auth";
 
 import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -91,8 +91,8 @@ export default function OperasiMesinManagement() {
         >
           {mesin.status_proses}
         </div>,
-        mesin.waktu_mulai,
-        mesin.waktu_selesai,
+        formatWaktuWib(mesin.waktu_mulai),
+        formatWaktuWib(mesin.waktu_selesai),
         <DropdownAction
           menu={
             mesin.status_proses === "berjalan"
