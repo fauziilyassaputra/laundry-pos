@@ -17,10 +17,9 @@ import { useAuthStore } from "@/store/auth-store";
 import {  useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpCircle, Pencil, ScrollText, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import DialogCreatePesanan from "./create-pesanan";
-import useReltimePesanan from "./realtime-pesanan";
 
 export default function PesananManagement() {
   
@@ -37,7 +36,7 @@ export default function PesananManagement() {
 
   const profile = useAuthStore((state) => state.profile);
 
-  const { data: pesanan_pesanan, isLoading } = useQuery({
+  const { data: pesanan_pesanan, isLoading, refetch: refetchPesanan } = useQuery({
     queryKey: ["pesanan_pesanan", currentPage, currentLimit, currentSearch, profile?.id, profile?.jabatan],
     queryFn: async () => {
       let query = supabase
@@ -66,7 +65,31 @@ export default function PesananManagement() {
     },
   });
 
-  // useReltimePesanan()
+   useEffect(() => {
+    const channel = supabase
+      .channel('change-pesanan')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pesanan',
+        },
+        () => {
+      queryClient.invalidateQueries({queryKey:["pesanan_pesanan"]});
+          refetchPesanan();
+
+    },
+      )
+      .subscribe();
+
+    return () => {
+      
+      supabase.removeChannel(channel);
+    };
+  }, [refetchPesanan, supabase]);
+
+
  
   const filteredData = useMemo(() => {
     return (pesanan_pesanan?.data || []).map((pesanan, index) => {
