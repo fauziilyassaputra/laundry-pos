@@ -15,17 +15,18 @@ import { HEADER_TABLE_PESANAN } from "@/constants/pesanan-constant";
 import useDataTable from "@/hooks/use-table";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Pencil, ScrollText, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreateCucian from "./create-cucian";
 import CardCucian from "./card-cucian";
 import CardStruk from "./struk";
 
 export default function ItemCucianManagement({ id: id }: { id: string }) {
-  const supabase = createClient();
+  // const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const {
     currentPage,
     currentLimit,
@@ -34,7 +35,7 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: item_cucian, isLoading } = useQuery({
+  const { data: item_cucian, isLoading, refetch: refetchCucian } = useQuery({
     queryKey: ["item_cucian", id],
     queryFn: async () => {
       const query = supabase
@@ -56,10 +57,39 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
       return result;
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`change-cucian-${id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'item_cucian',
+          filter: `id_pesanan=eq.${id}` ,
+        },
+        () => {
+          refetchCucian();
+
+    },
+      )
+      .subscribe();
+
+    return () => {
+      
+      supabase.removeChannel(channel);
+    };
+  }, [refetchCucian, supabase,id]);
+
+
+
+
+
   const filteredData = useMemo(() => {
     return (item_cucian?.data || []).map((item, index) => {
-      if (item.kondisi_cucian === null) {
-        item.kondisi_cucian = "catatan kosong";
+      if (item.kondisi_cucian === null || "") {
+        item.kondisi_cucian = "-";
       }
       return [
         currentLimit * (currentPage - 1) + index + 1,
