@@ -20,6 +20,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import DialogCreatePesanan from "./create-pesanan";
+import DialogNotes from "@/components/common/dialog-notes";
 
 export default function PesananManagement() {
   
@@ -93,9 +94,9 @@ export default function PesananManagement() {
  
   const filteredData = useMemo(() => {
     return (pesanan_pesanan?.data || []).map((pesanan, index) => {
-      // if (pesanan.catatan === null) {
-      //   pesanan.catatan = "Belum Dihitung";
-      // }
+      if (pesanan.catatan === null || "") {
+        pesanan.catatan = "-";
+      }
       if (pesanan.tanggal_selesai === null) {
         pesanan.tanggal_selesai = "Pesanan belum selesai";
       }
@@ -123,13 +124,19 @@ export default function PesananManagement() {
           {pesanan.status_pesanan}
         </div>,
         <h1 className="text-xl font-semibold">{pesanan.total_harga}</h1>,
-        <p
-          className={cn("tx-sm", {
-            "text-muted-foreground": pesanan.catatan === "Tidak Dicantumkan",
-          })}
-        >
-          {pesanan.catatan}
-        </p>,
+        pesanan.catatan && pesanan.catatan !== "-" ? (
+           <Dialog>
+          <DialogTrigger asChild>
+            <DialogTitle>
+              <Button size="sm" variant="outline">Catatan</Button>
+            </DialogTitle>
+          </DialogTrigger>
+          <DialogNotes text={pesanan.catatan} notesType="catatan pesanan" />
+          </Dialog>
+        ): (
+          <span>{pesanan.catatan}</span>
+        )
+        ,
         formatWaktuWib(pesanan.tanggal_masuk),
         formatWaktuWib(pesanan.tanggal_estimasi_selesai),
         formatWaktuWib(pesanan.tanggal_selesai),
