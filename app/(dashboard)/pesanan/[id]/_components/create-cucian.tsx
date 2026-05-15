@@ -7,7 +7,7 @@ import {
   cucianSchema,
 } from "@/validations/cucian-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startTransition, useActionState, useEffect } from "react";
+import { startTransition, useActionState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { createCucian } from "../actions";
 import { toast } from "sonner";
@@ -65,7 +65,7 @@ id_pesanan}: {
     }
   }, [createCucianState]);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const { data: pesananData, isLoading: loadPesanan } = useQuery({
     queryKey: ["pesanan_list", id_pesanan],
@@ -112,15 +112,16 @@ id_pesanan}: {
               type="text"
               placeHolder="Masukkan jenis pakaian"
             />
-          </div>
+          {/* </div> */}
 
           <FormInput
             form={form}
             name="berat_kg"
-            label="Berat per-Kilo"
+            label="Berat per-Kilo "
             type="number"
-            placeHolder="Masukkan berat pakaian"
+            placeHolder="Cth: 1"
           />
+          </div>
           <FormInput
             form={form}
             name="kondisi_cucian"

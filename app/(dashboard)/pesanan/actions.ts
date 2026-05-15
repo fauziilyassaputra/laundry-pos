@@ -12,7 +12,6 @@ export async function createPesanan(
     id_user: formData.get("id_user"),
     id_pelanggan: formData.get("id_pelanggan"),
     id_layanan: formData.get("id_layanan"),
-    total_harga: formData.get("total_harga"),
     tipe_pesanan: formData.get("tipe_pesanan"),
     catatan: formData.get("catatan"),
   });
@@ -38,7 +37,6 @@ export async function createPesanan(
     };
   }
 
-  const totalHargaNumber = parseFloat(rawData.total_harga);
 
   const { data: newOrder, error: insertError } = await supabase
     .from("pesanan")
@@ -48,7 +46,7 @@ export async function createPesanan(
         id_layanan: rawData.id_layanan,
         id_user: rawData.id_user || user?.id,
         tipe_pesanan: rawData.tipe_pesanan,
-        total_harga: totalHargaNumber,
+        total_harga: 0,
         status_pesanan: "diterima",
         catatan: rawData.catatan || null,
       },

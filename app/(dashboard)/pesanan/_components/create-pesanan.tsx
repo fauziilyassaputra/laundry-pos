@@ -154,13 +154,7 @@ export default function DialogCreatePesanan({
               ]}
             />
 
-            <FormInput
-              form={form}
-              name="total_harga"
-              label="Total Harga"
-              type="number"
-              placeHolder=" Default: 0"
-            />
+           
           </div>
 
           <FormInput

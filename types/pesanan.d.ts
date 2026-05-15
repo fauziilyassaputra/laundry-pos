@@ -5,7 +5,6 @@ export type PesananFormState = {
     id_layanan?: string[];
     id_user?: string[];
     status_pesanan?: string[];
-    total_harga?: string[];
     tipe_pesanan?: string[];
     catatan?: string[];
     _form?: string[];

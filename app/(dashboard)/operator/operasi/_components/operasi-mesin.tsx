@@ -25,14 +25,14 @@ import {
   Pencil,
   Trash2,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreateOperasi from "./create-operasi";
 import { useAuthStore } from "@/store/auth-store";
 
 export default function OperasiMesinManagement() {
   const profile = useAuthStore((state) => state.profile )
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const queryClient = useQueryClient();
   const {
     currentPage,
@@ -42,12 +42,13 @@ export default function OperasiMesinManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: operasi_mesin, isLoading } = useQuery({
+  const { data: operasi_mesin, isLoading, refetch: refetchMesin } = useQuery({
     queryKey: ["operasi_mesin", currentPage, currentLimit, currentSearch, profile?.id, profile?.jabatan],
     queryFn: async () => {
       let query = supabase
         .from("penggunaan_mesin")
         .select("*, pesanan!inner (id_user)", { count: "exact" })
+        .order("status_proses", {ascending: true})
         .range(
           (currentPage - 1) * currentLimit,
           currentPage * currentLimit - 1,
@@ -72,6 +73,36 @@ export default function OperasiMesinManagement() {
     },
     enabled: !!profile?.id,
   });
+  
+  
+  useEffect(() => {
+    const channel = supabase
+      .channel(`change-operasi`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'penggunaan_mesin',
+        },
+        () => {
+          refetchMesin();
+
+    },
+      )
+      .subscribe();
+
+    return () => {
+      
+      supabase.removeChannel(channel);
+    };
+  }, [refetchMesin, supabase]);
+
+
+
+
+
+
 
   const filteredData = useMemo(() => {
     return (operasi_mesin?.data || []).map((mesin, index) => {

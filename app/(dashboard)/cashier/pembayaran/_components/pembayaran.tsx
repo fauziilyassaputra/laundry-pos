@@ -13,7 +13,7 @@ import { cn, formatWaktuWib } from "@/lib/utils";
 import { Profile } from "@/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import UpdatePembayaran from "./update-pembayaran";
 import {
@@ -22,7 +22,7 @@ import {
 } from "@/validations/pembayaran-validation";
 
 export default function PembayaranManagement() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(),[]);
   const {
     currentPage,
     currentLimit,
@@ -31,16 +31,18 @@ export default function PembayaranManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: pembayaran, isLoading } = useQuery({
+  const { data: pembayaran, isLoading, refetch: refetchPembayaran } = useQuery({
     queryKey: ["pembayaran", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
         .from("pembayaran")
         .select("*", { count: "exact" })
+        .order("status_pembayaran",{ascending: true})
+        .order("tanggal_bayar", {ascending: false})
         .range(
           (currentPage - 1) * currentLimit,
           currentPage * currentLimit - 1,
-        );
+        )
       if (currentSearch) {
         query.or(
           `jumlah_bayar.ilike.%${currentSearch}%,status_pembayaran.ilike.%${currentSearch}%,metode_bayar.ilike.%${currentSearch}%`,
@@ -56,6 +58,32 @@ export default function PembayaranManagement() {
       return result;
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`change-pembayaran`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'pembayaran',
+        },
+        () => {
+          refetchPembayaran();
+
+    },
+      )
+      .subscribe();
+
+    return () => {
+      
+      supabase.removeChannel(channel);
+    };
+  }, [refetchPembayaran, supabase]);
+
+
+
 
   const [selectedAction, setSelectedAction] = useState<{
     data: Pembayaran;
