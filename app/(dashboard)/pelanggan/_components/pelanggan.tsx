@@ -2,7 +2,7 @@
 import DataTable from "@/components/common/data-table";
 import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_PELANGGAN } from "@/constants/pelanggan-constant";
 import useDataTable from "@/hooks/use-table";
@@ -13,6 +13,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreatePelanggan from "./create-pelanggan";
+import DialogNotes from "@/components/common/dialog-notes";
 
 export default function PelangganManagement() {
   const supabase = createClient();
@@ -49,22 +50,24 @@ export default function PelangganManagement() {
   });
   const filteredData = useMemo(() => {
     return (pelanggan_pelanggan?.data || []).map((pelanggan, index) => {
-      if (pelanggan.alamat_rumah === null) {
-        pelanggan.alamat_rumah = "Tidak Dicantumkan";
-      }
+      
       return [
         currentLimit * (currentPage - 1) + index + 1,
         pelanggan.id_pelanggan,
         pelanggan.nama_pelanggan,
         pelanggan.nomor_telepon,
-        <p
-          className={cn("tx-sm", {
-            "text-muted-foreground":
-              pelanggan.alamat_rumah === "Tidak Dicantumkan",
-          })}
-        >
-          {pelanggan.alamat_rumah}
-        </p>,
+         pelanggan.alamat_rumah && pelanggan.alamat_rumah !== "-" ? (
+           <Dialog>
+          <DialogTrigger asChild>
+            <DialogTitle>
+              <Button size="sm" variant="outline">Alamat</Button>
+            </DialogTitle>
+          </DialogTrigger>
+          <DialogNotes text={pelanggan.alamat_rumah} notesType="alamat pelanggan" />
+          </Dialog>
+        ): (
+          <span>-</span>
+        ),
         <DropdownAction
           menu={[
             {

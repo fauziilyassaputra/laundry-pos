@@ -96,8 +96,8 @@ export default function PembayaranManagement() {
 
   const filteredData = useMemo(() => {
     return (pembayaran?.data || []).map((bayar, index) => {
-      if (bayar.metode_bayar === null) {
-        bayar.metode_bayar = "belum memilih metode";
+      if (bayar.metode_bayar === null || "") {
+        bayar.metode_bayar = "-";
       }
       return [
         currentLimit * (currentPage - 1) + index + 1,

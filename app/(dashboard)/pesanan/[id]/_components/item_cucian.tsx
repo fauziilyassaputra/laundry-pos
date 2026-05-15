@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import CreateCucian from "./create-cucian";
 import CardCucian from "./card-cucian";
 import CardStruk from "./struk";
+import DialogNotes from "@/components/common/dialog-notes";
 
 export default function ItemCucianManagement({ id: id }: { id: string }) {
   // const supabase = createClient();
@@ -88,16 +89,23 @@ export default function ItemCucianManagement({ id: id }: { id: string }) {
 
   const filteredData = useMemo(() => {
     return (item_cucian?.data || []).map((item, index) => {
-      if (item.kondisi_cucian === null || "") {
-        item.kondisi_cucian = "-";
-      }
       return [
         currentLimit * (currentPage - 1) + index + 1,
         item.id_pesanan,
         item.jenis_pakaian,
         item.berat_kg,
-        item.kondisi_cucian,
-      ];
+ item.kondisi_cucian && item.kondisi_cucian !== "-" ? (
+           <Dialog>
+          <DialogTrigger asChild>
+            <DialogTitle>
+              <Button size="sm" variant="outline">Detail</Button>
+            </DialogTitle>
+          </DialogTrigger>
+          <DialogNotes text={item.kondisi_cucian} notesType="kondisi_cucian item" />
+          </Dialog>
+        ): (
+          <span>-</span>
+        )      ];
     });
   }, [item_cucian]);
 

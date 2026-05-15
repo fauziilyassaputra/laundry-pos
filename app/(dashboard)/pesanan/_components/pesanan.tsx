@@ -94,11 +94,9 @@ export default function PesananManagement() {
  
   const filteredData = useMemo(() => {
     return (pesanan_pesanan?.data || []).map((pesanan, index) => {
-      if (pesanan.catatan === null || "") {
-        pesanan.catatan = "-";
-      }
-      if (pesanan.tanggal_selesai === null) {
-        pesanan.tanggal_selesai = "Pesanan belum selesai";
+     
+      if (pesanan.tanggal_selesai === null || "") {
+        pesanan.tanggal_selesai = "-";
       }
       return [
         currentLimit * (currentPage - 1) + index + 1,
@@ -134,7 +132,7 @@ export default function PesananManagement() {
           <DialogNotes text={pesanan.catatan} notesType="catatan pesanan" />
           </Dialog>
         ): (
-          <span>{pesanan.catatan}</span>
+          <span>-</span>
         )
         ,
         formatWaktuWib(pesanan.tanggal_masuk),
