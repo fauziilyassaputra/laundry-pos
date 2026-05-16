@@ -38,12 +38,11 @@ export default function UpdatePembayaran({
   currentData?: Pembayaran;
   handleChangeAction?: (open: boolean) => void;
 }) {
-  const profile = useAuthStore((state) => state.profile);
 
+ 
   const form = useForm<pembayaranSchema>({
     resolver: zodResolver(pembayaranFormSchema),
   });
-  console.log(currentData);
 
   const [updatePembayaranState, updatePembayaranAction, isPendingOperasi] =
     useActionState(updatePembayaran, INITIAL_STATE_PEMBAYARAN);

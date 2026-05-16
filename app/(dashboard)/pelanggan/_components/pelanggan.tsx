@@ -14,6 +14,8 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreatePelanggan from "./create-pelanggan";
 import DialogNotes from "@/components/common/dialog-notes";
+import { Pelanggan } from "@/validations/pelanggan-validation";
+import UpdatePelanggan from "./update-pelanggan";
 
 export default function PelangganManagement() {
   const supabase = createClient();
@@ -48,6 +50,18 @@ export default function PelangganManagement() {
       return result;
     },
   });
+
+const [selectedAction, setSelectedAction] = useState<{
+    data: Pelanggan;
+    type: "update" | "delete";
+  } | null>(null);
+
+  const handleChangeAction = (open: boolean) => {
+    if (!open) setSelectedAction(null);
+  };
+
+
+
   const filteredData = useMemo(() => {
     return (pelanggan_pelanggan?.data || []).map((pelanggan, index) => {
       
@@ -77,7 +91,9 @@ export default function PelangganManagement() {
                   Edit
                 </span>
               ),
-              action: () => {},
+              action: () => {
+                setSelectedAction({data: pelanggan, type: 'update'}) 
+              },
             },
             {
               label: (
@@ -128,6 +144,7 @@ export default function PelangganManagement() {
         currentLimit={currentLimit}
         onChangeLimit={handleChangeLimit}
       />
+      <UpdatePelanggan open={selectedAction !== null && selectedAction.type === "update"} currentData={selectedAction?.data} handleChangeAction={handleChangeAction} />
     </div>
   );
 }

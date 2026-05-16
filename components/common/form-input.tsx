@@ -20,17 +20,19 @@ export default function FormInput<T extends FieldValues>({
     <Controller
       name={name}
       control={form.control}
-      render={({ field: { ...rest }, fieldState }) => (
+      render={({ field: { value,...rest }, fieldState }) => (
         <Field>
           <FieldLabel>{label}</FieldLabel>
           {type === "textarea" ? (
-            <Textarea {...rest} placeholder={placeHolder} autoComplete="off" />
+            <Textarea {...rest} placeholder={placeHolder} autoComplete="off" value={value || " "}
+ /> 
           ) : (
             <Input
               {...rest}
               type={type}
               placeholder={placeHolder}
               autoComplete="off"
+              value={value || " "}
             />
           )}
 
