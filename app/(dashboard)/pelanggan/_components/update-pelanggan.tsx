@@ -1,4 +1,8 @@
-import { Pelanggan, pelangganFormSchema, pelangganSchema } from "@/validations/pelanggan-validation";
+import {
+  Pelanggan,
+  pelangganFormSchema,
+  pelangganSchema,
+} from "@/validations/pelanggan-validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -7,43 +11,53 @@ import { INITIAL_STATE_PELANGGAN } from "@/constants/pelanggan-constant";
 import { keyof } from "zod";
 import { toast } from "sonner";
 import FormInput from "@/components/common/form-input";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import FormSelect from "@/components/common/form-select";
 
 export default function UpdatePelanggan({
-    currentData, open, handleChangeAction
-} : {
-    currentData?: Pelanggan;
-    open?: boolean;
-    handleChangeAction: (open: boolean) => void
-}){
-    const form = useForm<pelangganSchema>({
-        resolver: zodResolver(pelangganFormSchema)
-    })
-    const [updatePelangganState, updatePelangganAction,isPendingPelanggan] = useActionState(updatePelanggan,INITIAL_STATE_PELANGGAN);
+  currentData,
+  open,
+  handleChangeAction,
+}: {
+  currentData?: Pelanggan;
+  open?: boolean;
+  handleChangeAction: (open: boolean) => void;
+}) {
+  const form = useForm<pelangganSchema>({
+    resolver: zodResolver(pelangganFormSchema),
+  });
+  const [updatePelangganState, updatePelangganAction, isPendingPelanggan] =
+    useActionState(updatePelanggan, INITIAL_STATE_PELANGGAN);
 
-
-    const onSubmit = form.handleSubmit((data) => {
-        const formData = new FormData()
-        Object.entries(data).forEach(([key,value]) => {
-           if (value !== null && value !== undefined) {
-                formData.append(key, String(value).trim());
-            } else {
-                formData.append(key, ""); 
-            }
-        })
-       if (currentData?.id_pelanggan) {
-            formData.append("id_pelanggan", currentData.id_pelanggan);
-        }
-        startTransition(() => {
-            updatePelangganAction(formData)
-        })
-    })
-    useEffect(() => {
+  const onSubmit = form.handleSubmit((data) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== null && value !== undefined) {
+        formData.append(key, String(value).trim());
+      } else {
+        formData.append(key, "");
+      }
+    });
+    if (currentData?.id_pelanggan) {
+      formData.append("id_pelanggan", currentData.id_pelanggan);
+    }
+    startTransition(() => {
+      updatePelangganAction(formData);
+    });
+  });
+  useEffect(() => {
     if (updatePelangganState?.status === "error") {
-      toast.error("Create operasi Failed ", {
+      toast.error("Update Pelanggan Failed ", {
         description:
           updatePelangganState.message ||
           updatePelangganState.errors?._form?.[0],
@@ -51,25 +65,24 @@ export default function UpdatePelanggan({
     }
 
     if (updatePelangganState?.status === "success") {
-      toast.success("Create operasi Success");
+      toast.success("Update Pelanggan Success");
       form.reset();
     }
     if (handleChangeAction) {
-        handleChangeAction(false); 
-      }
+      handleChangeAction(false);
+    }
   }, [updatePelangganState]);
 
-
   useEffect(() => {
-    if (currentData){
-        form.setValue("nama_pelanggan", currentData?.nama_pelanggan);
-        form.setValue("nomor_telepon", currentData?.nomor_telepon);
-        form.setValue("alamat_rumah", currentData?.alamat_rumah || "");
+    if (currentData) {
+      form.setValue("nama_pelanggan", currentData?.nama_pelanggan);
+      form.setValue("nomor_telepon", currentData?.nomor_telepon);
+      form.setValue("alamat_rumah", currentData?.alamat_rumah || "");
     }
-  }, [currentData])
+  }, [currentData]);
 
-    return(
- <Dialog open={open} onOpenChange={handleChangeAction}>
+  return (
+    <Dialog open={open} onOpenChange={handleChangeAction}>
       <DialogContent className="sm:max-w-106.25 max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>Update Pelanggan</DialogTitle>
@@ -82,22 +95,19 @@ export default function UpdatePelanggan({
                 form={form}
                 name="nama_pelanggan"
                 label="Nama Pelanggan"
-
               />
               <FormInput
                 form={form}
                 name="nomor_telepon"
                 label="nomor telepon"
               />
-             
             </div>
-              <FormInput
-                form={form}
-                name="alamat_rumah"
-                label="alamat rumah"
-                type="textarea"
-                
-              />
+            <FormInput
+              form={form}
+              name="alamat_rumah"
+              label="alamat rumah"
+              type="textarea"
+            />
           </div>
 
           <DialogFooter>
@@ -114,6 +124,6 @@ export default function UpdatePelanggan({
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>    )
-
+    </Dialog>
+  );
 }

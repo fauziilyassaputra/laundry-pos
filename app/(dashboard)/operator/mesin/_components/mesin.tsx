@@ -14,10 +14,12 @@ import { Pencil, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreateMesin from "./create-mesin";
+import UpdateMesin from "./update-mesin";
+import { Mesin } from "@/validations/mesin-validation";
 
 export default function MesinManagement() {
   const supabase = createClient();
-  const profile = useAuthStore((state) => state.profile)
+  const profile = useAuthStore((state) => state.profile);
   const {
     currentPage,
     currentLimit,
@@ -51,10 +53,20 @@ export default function MesinManagement() {
       return result;
     },
   });
+
+  const [selectedAction, setSelectedAction] = useState<{
+    data: Mesin;
+    type: "update" | "delete";
+  } | null>(null);
+
+  const handleChangeActions = (open: boolean) => {
+    if (!open) setSelectedAction(null);
+  };
+
   const filteredData = useMemo(() => {
     return (mesin_mesin?.data || []).map((mesin, index) => {
-      if (mesin.tanggal_service_terakhir === null) {
-        mesin.tanggal_service_terakhir = "tidak ada perbaikan sama sekali";
+      if (mesin.tanggal_service_terakhir === null || "") {
+        mesin.tanggal_service_terakhir = "-";
       }
       return [
         currentLimit * (currentPage - 1) + index + 1,
@@ -73,36 +85,35 @@ export default function MesinManagement() {
         mesin.tanggal_service_terakhir,
         <DropdownAction
           menu={
-            profile?.jabatan === "manager" ? [
-                
-            {
-              label: (
-                <span className="flex item-center gap-2">
-                  <Pencil />
-                  Edit
-                </span>
-              ),
-              action: () => {},
-            },
-            {
-              label: (
-                <span className="flex item-center gap-2">
-                  <Trash2 className="text-red-400" />
-                  Delete
-                </span>
-              ),
-              variant: "destructive",
-              action: () => {},
-            },
-          
-            ] : [
-              {label: (
-                 <span>Kamu tidak punya akses</span>
-              ) 
-               
-              }
-            ]}
-    
+            profile?.jabatan === "manager"
+              ? [
+                  {
+                    label: (
+                      <span className="flex item-center gap-2">
+                        <Pencil />
+                        Edit
+                      </span>
+                    ),
+                    action: () => {
+                      setSelectedAction({
+                        data: mesin,
+                        type: "update",
+                      });
+                    },
+                  },
+                  {
+                    label: (
+                      <span className="flex item-center gap-2">
+                        <Trash2 className="text-red-400" />
+                        Delete
+                      </span>
+                    ),
+                    variant: "destructive",
+                    action: () => {},
+                  },
+                ]
+              : [{ label: <span>Kamu tidak punya akses</span> }]
+          }
         />,
       ];
     });
@@ -113,7 +124,7 @@ export default function MesinManagement() {
       ? Math.ceil(mesin_mesin.count / currentLimit)
       : 0;
   }, [mesin_mesin]);
- const [openCreateOrder, setOpenCreateOrder] = useState(false);
+  const [openCreateOrder, setOpenCreateOrder] = useState(false);
   return (
     <div className="w-full">
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
@@ -124,14 +135,13 @@ export default function MesinManagement() {
             onChange={(e) => handleChangeSearch(e.target.value)}
           />
           {profile?.jabatan === "manager" && (
-<Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
-            <DialogTrigger asChild>
-              <Button variant="outline">Create</Button>
-            </DialogTrigger>
-            <CreateMesin closeDialog={() => setOpenCreateOrder(false) } />
-          </Dialog>
+            <Dialog open={openCreateOrder} onOpenChange={setOpenCreateOrder}>
+              <DialogTrigger asChild>
+                <Button variant="outline">Create</Button>
+              </DialogTrigger>
+              <CreateMesin closeDialog={() => setOpenCreateOrder(false)} />
+            </Dialog>
           )}
-          
         </div>
       </div>
       <DataTable
@@ -143,6 +153,11 @@ export default function MesinManagement() {
         totalPage={totalPages}
         currentLimit={currentLimit}
         onChangeLimit={handleChangeLimit}
+      />
+      <UpdateMesin
+        currentData={selectedAction?.data}
+        open={setSelectedAction !== null && selectedAction?.type === "update"}
+        handleChangeAction={handleChangeActions}
       />
     </div>
   );
