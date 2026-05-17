@@ -12,13 +12,15 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreateLayanan from "./create-layanan";
+import { Layanan } from "@/validations/layanan-validation";
+import UpdateLayanan from "./update-layanan";
 
 export default function LayananManagement() {
   const profile = useAuthStore((state) => state.profile);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const {
     currentPage,
     currentLimit,
@@ -27,7 +29,11 @@ export default function LayananManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: layanan_layanan, isLoading } = useQuery({
+  const {
+    data: layanan_layanan,
+    isLoading,
+    refetch: refetchLayanan,
+  } = useQuery({
     queryKey: ["layanan_layanan", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
@@ -51,6 +57,37 @@ export default function LayananManagement() {
       return result;
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`change-layanan`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "layanan",
+        },
+        () => {
+          refetchLayanan();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetchLayanan, supabase]);
+
+  const [selectedAction, setSelectedAction] = useState<{
+    data: Layanan;
+    type: "update" | "delete";
+  } | null>(null);
+
+  const handleChangeActions = (open: boolean) => {
+    if (!open) setSelectedAction(null);
+  };
+
   const filteredData = useMemo(() => {
     return (layanan_layanan?.data || []).map((layanan, index) => {
       return [
@@ -69,7 +106,12 @@ export default function LayananManagement() {
                     Edit
                   </span>
                 ),
-                action: () => {},
+                action: () => {
+                  setSelectedAction({
+                    data: layanan,
+                    type: "update",
+                  });
+                },
               },
               {
                 label: (
@@ -85,7 +127,7 @@ export default function LayananManagement() {
           />
         ),
       ];
-    }); 
+    });
   }, [layanan_layanan]);
 
   const totalPages = useMemo(() => {
@@ -123,6 +165,11 @@ export default function LayananManagement() {
         totalPage={totalPages}
         currentLimit={currentLimit}
         onChangeLimit={handleChangeLimit}
+      />
+      <UpdateLayanan
+        currentData={selectedAction?.data}
+        handleChangeAction={handleChangeActions}
+        open={setSelectedAction !== null && selectedAction?.type == "update"}
       />
     </div>
   );
