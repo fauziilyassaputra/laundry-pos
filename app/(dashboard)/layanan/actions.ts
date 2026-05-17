@@ -97,3 +97,26 @@ export async function updateLayanan(
     message: "Layanan berhasil diperbarui!",
   };
 }
+
+export async function deleteLayanan(
+  prevState: LayananFormState,
+  formData: FormData,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("layanan")
+    .delete()
+    .eq("id_layanan", formData.get("id_layanan"));
+
+  if (error) {
+    return {
+      status: "error",
+      errors: {
+        ...prevState.errors,
+        _form: [error.message],
+      },
+    };
+  }
+  revalidatePath("/layanan");
+  return { status: "success" };
+}

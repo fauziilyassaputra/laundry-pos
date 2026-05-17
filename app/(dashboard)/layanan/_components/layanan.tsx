@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import CreateLayanan from "./create-layanan";
 import { Layanan } from "@/validations/layanan-validation";
 import UpdateLayanan from "./update-layanan";
+import DeleteLayanan from "./delete-layanan";
 
 export default function LayananManagement() {
   const profile = useAuthStore((state) => state.profile);
@@ -121,7 +122,12 @@ export default function LayananManagement() {
                   </span>
                 ),
                 variant: "destructive",
-                action: () => {},
+                action: () => {
+                  setSelectedAction({
+                    data: layanan,
+                    type: "delete",
+                  });
+                },
               },
             ]}
           />
@@ -170,6 +176,11 @@ export default function LayananManagement() {
         currentData={selectedAction?.data}
         handleChangeAction={handleChangeActions}
         open={setSelectedAction !== null && selectedAction?.type == "update"}
+      />
+      <DeleteLayanan
+        currentData={selectedAction?.data}
+        handleChangeAction={handleChangeActions}
+        open={setSelectedAction !== null && selectedAction?.type == "delete"}
       />
     </div>
   );
