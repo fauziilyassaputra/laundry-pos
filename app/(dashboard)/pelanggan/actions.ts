@@ -63,11 +63,10 @@ export async function createPelanggan(
   };
 }
 
-
 export async function updatePelanggan(
-   prevState: PelangganFormState,
+  prevState: PelangganFormState,
   formData: FormData,
-){
+) {
   const validatedFields = pelangganFormSchema.safeParse({
     nama_pelanggan: formData.get("nama_pelanggan"),
     nomor_telepon: formData.get("nomor_telepon"),
@@ -95,17 +94,15 @@ export async function updatePelanggan(
     };
   }
 
-  const id_pelanggan = formData.get("id_pelanggan")
-  
-   const { data: newOrder, error: insertError } = await supabase
+  const id_pelanggan = formData.get("id_pelanggan");
+
+  const { data: newOrder, error: insertError } = await supabase
     .from("pelanggan")
-    .update(
-      {
-        nama_pelanggan: rawData.nama_pelanggan,
-        nomor_telepon: rawData.nomor_telepon,
-        alamat_rumah: rawData.alamat_rumah,
-      },
-    )
+    .update({
+      nama_pelanggan: rawData.nama_pelanggan,
+      nomor_telepon: rawData.nomor_telepon,
+      alamat_rumah: rawData.alamat_rumah,
+    })
     .eq("id_pelanggan", id_pelanggan);
 
   if (insertError) {
@@ -121,5 +118,27 @@ export async function updatePelanggan(
     status: "success",
     message: "Data pelanggan baru berhasil diperbarui!",
   };
+}
 
+export async function deletePelanggan(
+  prevState: PelangganFormState,
+  formData: FormData,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("pelanggan")
+    .delete()
+    .eq("id_pelanggan", formData.get("id_pelanggan"));
+
+  if (error) {
+    return {
+      status: "error",
+      errors: {
+        ...prevState.errors,
+        _form: [error.message],
+      },
+    };
+  }
+  revalidatePath("/pelanggan");
+  return { status: "success" };
 }

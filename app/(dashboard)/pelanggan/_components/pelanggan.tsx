@@ -2,7 +2,12 @@
 import DataTable from "@/components/common/data-table";
 import DropdownAction from "@/components/common/dropdown-action";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { HEADER_TABLE_PELANGGAN } from "@/constants/pelanggan-constant";
 import useDataTable from "@/hooks/use-table";
@@ -10,15 +15,16 @@ import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreatePelanggan from "./create-pelanggan";
 import DialogNotes from "@/components/common/dialog-notes";
 import { Pelanggan } from "@/validations/pelanggan-validation";
 import UpdatePelanggan from "./update-pelanggan";
+import DeletePelanggan from "./delete-pelanggan";
 
 export default function PelangganManagement() {
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const {
     currentPage,
     currentLimit,
@@ -27,7 +33,11 @@ export default function PelangganManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: pelanggan_pelanggan, isLoading } = useQuery({
+  const {
+    data: pelanggan_pelanggan,
+    isLoading,
+    refetch: refetchPelanggan,
+  } = useQuery({
     queryKey: ["pelanggan_pelanggan", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
@@ -51,7 +61,28 @@ export default function PelangganManagement() {
     },
   });
 
-const [selectedAction, setSelectedAction] = useState<{
+  useEffect(() => {
+    const channel = supabase
+      .channel(`change-pelanggan`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "pelanggan",
+        },
+        () => {
+          refetchPelanggan();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetchPelanggan, supabase]);
+
+  const [selectedAction, setSelectedAction] = useState<{
     data: Pelanggan;
     type: "update" | "delete";
   } | null>(null);
@@ -60,26 +91,28 @@ const [selectedAction, setSelectedAction] = useState<{
     if (!open) setSelectedAction(null);
   };
 
-
-
   const filteredData = useMemo(() => {
     return (pelanggan_pelanggan?.data || []).map((pelanggan, index) => {
-      
       return [
         currentLimit * (currentPage - 1) + index + 1,
         pelanggan.id_pelanggan,
         pelanggan.nama_pelanggan,
         pelanggan.nomor_telepon,
-         pelanggan.alamat_rumah && pelanggan.alamat_rumah !== "-" ? (
-           <Dialog>
-          <DialogTrigger asChild>
-            <DialogTitle>
-              <Button size="sm" variant="outline">Alamat</Button>
-            </DialogTitle>
-          </DialogTrigger>
-          <DialogNotes text={pelanggan.alamat_rumah} notesType="alamat pelanggan" />
+        pelanggan.alamat_rumah && pelanggan.alamat_rumah !== "-" ? (
+          <Dialog>
+            <DialogTrigger asChild>
+              <DialogTitle>
+                <Button size="sm" variant="outline">
+                  Alamat
+                </Button>
+              </DialogTitle>
+            </DialogTrigger>
+            <DialogNotes
+              text={pelanggan.alamat_rumah}
+              notesType="alamat pelanggan"
+            />
           </Dialog>
-        ): (
+        ) : (
           <span>-</span>
         ),
         <DropdownAction
@@ -92,7 +125,7 @@ const [selectedAction, setSelectedAction] = useState<{
                 </span>
               ),
               action: () => {
-                setSelectedAction({data: pelanggan, type: 'update'}) 
+                setSelectedAction({ data: pelanggan, type: "update" });
               },
             },
             {
@@ -103,7 +136,9 @@ const [selectedAction, setSelectedAction] = useState<{
                 </span>
               ),
               variant: "destructive",
-              action: () => {},
+              action: () => {
+                setSelectedAction({ data: pelanggan, type: "delete" });
+              },
             },
           ]}
         />,
@@ -144,7 +179,16 @@ const [selectedAction, setSelectedAction] = useState<{
         currentLimit={currentLimit}
         onChangeLimit={handleChangeLimit}
       />
-      <UpdatePelanggan open={selectedAction !== null && selectedAction.type === "update"} currentData={selectedAction?.data} handleChangeAction={handleChangeAction} />
+      <UpdatePelanggan
+        open={selectedAction !== null && selectedAction.type === "update"}
+        currentData={selectedAction?.data}
+        handleChangeAction={handleChangeAction}
+      />
+      <DeletePelanggan
+        open={selectedAction !== null && selectedAction.type === "delete"}
+        currentData={selectedAction?.data}
+        handleChangeAction={handleChangeAction}
+      />
     </div>
   );
 }
