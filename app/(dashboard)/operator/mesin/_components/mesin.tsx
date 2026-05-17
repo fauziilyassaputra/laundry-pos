@@ -11,11 +11,12 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import CreateMesin from "./create-mesin";
 import UpdateMesin from "./update-mesin";
 import { Mesin } from "@/validations/mesin-validation";
+import DeleteMesin from "./delete-mesin";
 
 export default function MesinManagement() {
   const supabase = createClient();
@@ -28,7 +29,11 @@ export default function MesinManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: mesin_mesin, isLoading } = useQuery({
+  const {
+    data: mesin_mesin,
+    isLoading,
+    refetch: refetchMesin,
+  } = useQuery({
     queryKey: ["mesin_mesin", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
@@ -53,6 +58,27 @@ export default function MesinManagement() {
       return result;
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel(`change-mesin`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "mesin",
+        },
+        () => {
+          refetchMesin();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetchMesin, supabase]);
 
   const [selectedAction, setSelectedAction] = useState<{
     data: Mesin;
@@ -109,7 +135,9 @@ export default function MesinManagement() {
                       </span>
                     ),
                     variant: "destructive",
-                    action: () => {},
+                    action: () => {
+                      setSelectedAction({ data: mesin, type: "delete" });
+                    },
                   },
                 ]
               : [{ label: <span>Kamu tidak punya akses</span> }]
@@ -158,6 +186,11 @@ export default function MesinManagement() {
         currentData={selectedAction?.data}
         open={setSelectedAction !== null && selectedAction?.type === "update"}
         handleChangeAction={handleChangeActions}
+      />
+      <DeleteMesin
+        handleChangeAction={handleChangeActions}
+        currentData={selectedAction?.data}
+        open={setSelectedAction !== null && selectedAction?.type === "delete"}
       />
     </div>
   );

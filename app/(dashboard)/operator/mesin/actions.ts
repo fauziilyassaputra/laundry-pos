@@ -102,3 +102,26 @@ export async function updateMesin(
     message: "mesin berhasil diupdate!",
   };
 }
+
+export async function deleteMesin(
+  prevState: MesinFormState,
+  formData: FormData,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("mesin")
+    .delete()
+    .eq("id_mesin", formData.get("id_mesin"));
+
+  if (error) {
+    return {
+      status: "error",
+      errors: {
+        ...prevState.errors,
+        _form: [error.message],
+      },
+    };
+  }
+  revalidatePath("/operator/mesin");
+  return { status: "success" };
+}

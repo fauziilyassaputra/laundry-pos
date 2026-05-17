@@ -33,7 +33,7 @@ export default function DialogDelete({
         <DialogHeader>
           <DialogTitle>Delete {title}</DialogTitle>
           <DialogDescription>
-            Apakah kamu yakin ingin menghapus {title} ?
+            Apakah kamu yakin ingin menghapus {title} ini ?
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
