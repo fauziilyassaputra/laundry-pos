@@ -22,7 +22,7 @@ import {
 } from "@/validations/pembayaran-validation";
 
 export default function PembayaranManagement() {
-  const supabase = useMemo(() => createClient(),[]);
+  const supabase = useMemo(() => createClient(), []);
   const {
     currentPage,
     currentLimit,
@@ -31,18 +31,22 @@ export default function PembayaranManagement() {
     handleChangeLimit,
     handleChangeSearch,
   } = useDataTable();
-  const { data: pembayaran, isLoading, refetch: refetchPembayaran } = useQuery({
+  const {
+    data: pembayaran,
+    isLoading,
+    refetch: refetchPembayaran,
+  } = useQuery({
     queryKey: ["pembayaran", currentPage, currentLimit, currentSearch],
     queryFn: async () => {
       const query = supabase
         .from("pembayaran")
         .select("*", { count: "exact" })
-        .order("status_pembayaran",{ascending: true})
-        .order("tanggal_bayar", {ascending: false})
+        .order("status_pembayaran", { ascending: true })
+        .order("tanggal_bayar", { ascending: false })
         .range(
           (currentPage - 1) * currentLimit,
           currentPage * currentLimit - 1,
-        )
+        );
       if (currentSearch) {
         query.or(
           `jumlah_bayar.ilike.%${currentSearch}%,status_pembayaran.ilike.%${currentSearch}%,metode_bayar.ilike.%${currentSearch}%`,
@@ -63,27 +67,22 @@ export default function PembayaranManagement() {
     const channel = supabase
       .channel(`change-pembayaran`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'pembayaran',
+          event: "*",
+          schema: "public",
+          table: "pembayaran",
         },
         () => {
           refetchPembayaran();
-
-    },
+        },
       )
       .subscribe();
 
     return () => {
-      
       supabase.removeChannel(channel);
     };
   }, [refetchPembayaran, supabase]);
-
-
-
 
   const [selectedAction, setSelectedAction] = useState<{
     data: Pembayaran;
@@ -108,7 +107,7 @@ export default function PembayaranManagement() {
           className={cn("px-2 py-1 rounded-full text-white w-fit capitalize", {
             "bg-green-600": bayar.status_pembayaran === "lunas",
             "bg-red-600": bayar.status_pembayaran === "bayar",
-            "bg-blue-400" : bayar.status_pembayaran === "uang muka",
+            "bg-blue-400": bayar.status_pembayaran === "uang muka",
           })}
         >
           {bayar.status_pembayaran}
@@ -120,8 +119,8 @@ export default function PembayaranManagement() {
         >
           {bayar.metode_bayar}
         </p>,
-        formatWaktuWib( bayar.tanggal_bayar),
-       
+        formatWaktuWib(bayar.tanggal_bayar),
+
         <DropdownAction
           menu={[
             {
@@ -134,7 +133,6 @@ export default function PembayaranManagement() {
               action: () => {
                 setSelectedAction({ data: bayar, type: "update" });
               },
-              
             },
             {
               label: (

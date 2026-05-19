@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { updatePembayaran } from "../actions";
 import { toast } from "sonner";
 
@@ -28,6 +28,7 @@ import {
   INITIAL_PEMBAYARAN,
   INITIAL_STATE_PEMBAYARAN,
 } from "@/constants/pembayaran-constant";
+import { useQuery } from "@tanstack/react-query";
 
 export default function UpdatePembayaran({
   open,
@@ -38,8 +39,6 @@ export default function UpdatePembayaran({
   currentData?: Pembayaran;
   handleChangeAction?: (open: boolean) => void;
 }) {
-
- 
   const form = useForm<pembayaranSchema>({
     resolver: zodResolver(pembayaranFormSchema),
   });
@@ -66,15 +65,31 @@ export default function UpdatePembayaran({
           updatePembayaranState.errors?._form?.[0],
       });
     }
-
     if (updatePembayaranState?.status === "success") {
       toast.success("Create operasi Success");
       form.reset();
     }
     if (handleChangeAction) {
-        handleChangeAction(false); 
-      }
+      handleChangeAction(false);
+    }
   }, [updatePembayaranState]);
+
+  const supabase = createClient();
+
+  const { data: pesananData, isLoading: loadingPesanan } = useQuery({
+    queryKey: ["pesanan-pesanan", currentData?.id_pesanan],
+    queryFn: async () => {
+      const query = supabase
+        .from("pesanan")
+        .select("total_harga, status_pesanan")
+        .eq("id_pesanan", currentData?.id_pesanan)
+        .single();
+      const { data, error } = await query;
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!currentData?.id_pesanan,
+  });
 
   useEffect(() => {
     if (currentData) {
@@ -86,6 +101,12 @@ export default function UpdatePembayaran({
     }
   }, [currentData]);
 
+  const jumlah_bayar_form = useWatch({
+    control: form.control,
+    name: "jumlah_bayar",
+  });
+  const is_lebih_bayar =
+    Number(jumlah_bayar_form) > Number(pesananData?.total_harga);
   return (
     <Dialog open={open} onOpenChange={handleChangeAction}>
       <DialogContent className="sm:max-w-106.25 max-h-[90vh]">
@@ -120,8 +141,7 @@ export default function UpdatePembayaran({
               <FormInput
                 form={form}
                 name="jumlah_bayar"
-                label="Jumlah bayar"
-                placeHolder="Default: 0"
+                label={`harus bayar: ${pesananData?.total_harga} `}
               />
               <FormSelect
                 form={form}
@@ -150,7 +170,7 @@ export default function UpdatePembayaran({
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">
+            <Button type="submit" disabled={is_lebih_bayar || isPendingOperasi}>
               {isPendingOperasi ? (
                 <Loader2 className="animate-spin" />
               ) : (
